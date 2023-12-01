@@ -1,0 +1,130 @@
+﻿// See https://aka.ms/new-console-template for more information
+//Console.WriteLine("Hello, World!");
+
+
+using System;
+using System.IO.Compression;
+
+namespace ag
+{
+    class Program
+    {
+        // Debug
+
+        // Private static bool myDEBUG = true;
+        private static bool myDEBUGmacos = false;
+        private static bool myDEBUGfr = false;
+        
+
+        public class dlb_node
+        {
+            public char letter;
+            int valid;
+            dlb_node sibling;
+            dlb_node child;
+
+            public class dlb_create (char c)
+            {
+                dlb_node.letter = c;
+ 
+            }
+        }
+
+
+        
+
+        // global linked lists
+        public class AnagramNode
+        {
+                public AnagramNode next;    // pointer to the next node        
+                public List<char> anagram = new List<char>();
+                public int found;
+                public int guessed;
+                public int length;
+        }
+        
+        public class AnagramLinkedList
+        {
+            private AnagramNode head;   // pointer to the root node
+/*            private class Node // list of anagram words
+            {
+                public List<char> anagram = new List<char>();
+                public int found;
+                public int guessed;
+                public int length;
+                public Node next;
+
+                /*public Node(List<char> a)
+                {
+                    anagram = a;
+                    found = 0;
+                    guessed = 0;
+                    length = 0;
+                    next = null;
+                }*/
+            }
+
+/*            public void AddNode(T t)
+            {
+                Node newNode = new Node();
+                newNode.Next = head;
+                newNode.Data = t;
+                head = newNode;
+            }*/
+        }
+
+
+        public class CharactersLinkedList
+        {
+            private Dlbnode dlbHead;
+
+            private class Dlbnode {
+                public char letter;
+                public int valid;
+                public Dlbnode sibling;
+                public Dlbnode child;
+
+                /*public Dlbnode(char c)
+                {
+                    letter = c;
+                    valid = 0;
+                    sibling = null;
+                    child = null;
+                }*/
+            }
+        }
+
+
+        static void Main(string[] args)
+        {
+            //Node head = new Node(null);
+            //Dlbnode dlbhead = new Dlbnode();
+            AnagramLinkedList anagrams = new AnagramLinkedList();
+            CharactersLinkedList characters = new CharactersLinkedList();
+
+
+
+            Console.WriteLine("good start");
+
+            //find the local path with the IETF international code
+            string dictonaryPathLanguage = DictPathLanguage();
+        }
+
+                // method to identify the local language path for the locale files (dictionarity, background, ...)
+        private static string DictPathLanguage()
+        {
+            string path = "i18n/";
+            if (!myDEBUGmacos) path = "../../../i18n/"; 
+            
+            string lang;
+            lang = System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag;
+            //backup in case no locale was returned: en-GB
+            if (lang == null) lang = "en-GB";
+            if (myDEBUGfr) { lang = "fr-FR";}
+            //To be extended with checks for "isValidLocale"?
+            
+            return path + lang + "/";
+        }
+    }
+
+}

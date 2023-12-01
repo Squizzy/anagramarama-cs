@@ -1,0 +1,14 @@
+C:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\ag.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\ag.AssemblyInfoInputs.cache
+C:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\ag.AssemblyInfo.cs
+C:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\ag.csproj.CoreCompileInputs.cache
+c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\bin\Debug\net8.0\ag.exe
+c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\bin\Debug\net8.0\ag.deps.json
+c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\bin\Debug\net8.0\ag.runtimeconfig.json
+c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\bin\Debug\net8.0\ag.dll
+c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\bin\Debug\net8.0\ag.pdb
+c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\ag.dll
+c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\refint\ag.dll
+c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\ag.pdb
+c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\ag.genruntimeconfig.cache
+c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\ref\ag.dll
