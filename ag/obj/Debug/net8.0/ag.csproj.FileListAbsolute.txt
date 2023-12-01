@@ -12,3 +12,4 @@ c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.
 c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\ag.pdb
 c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\ag.genruntimeconfig.cache
 c:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\ref\ag.dll
+C:\Users\guill\Documents\Coding\Anagramarama\anagramarama-cs2\ag\obj\Debug\net8.0\ag.sourcelink.json
