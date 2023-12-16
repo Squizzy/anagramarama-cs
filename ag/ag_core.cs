@@ -1,0 +1,111 @@
+using System.Net;
+using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
+using System.Security.Cryptography;
+
+namespace ag
+{
+    partial class Program
+    {
+        static char SPACE_CHAR = '#';
+
+        // returns the first occurrence of SPACE_CHAR in a string
+        public static int? NextBlank(string thisString)
+        {
+            return thisString.IndexOf(SPACE_CHAR);
+        }
+
+        // shift a string one character to the left, truncating the leftmost character
+        public static string ShitfLeftKill(string thisString)
+        {
+            return thisString.Remove(0,1);
+        }
+
+        // shift a string one character to the left and move the first character to the end so it wraps around
+        public static string ShiftLeft(string thisString)
+        {
+            return string.Concat(thisString.Remove(0,1) , thisString.Substring(0,1));
+        }
+
+        // Generate all possible combinations of the root word "remain" the initial letter is fixed (save under "head"), so to work out all anagrams in the dictionarydlbHead, prefix with space.
+        //public void Ag(Node head, dlb_node dlbHead, string guess, string remain)
+        public static Node Ag(Node head, dlb_node dlbHead, string guess, string remain)
+        {
+            char[] newRemain;
+            int totalLen = 0, guessLen = 0, remainLen = 0;
+            //newGuess[0] = '\0';
+
+            guessLen = guess.Length;
+            remainLen = remain.Length;
+            totalLen = guessLen + remainLen;
+            
+            char[] newGuess = new char[totalLen+1];
+            
+            //if (guess.Length != 0) 
+            for (int j=0; j<guess.Length; j++) newGuess[j] = guess[j];
+            newRemain = remain.ToCharArray();
+
+            newGuess[guessLen] = newRemain[remainLen-1];
+            newGuess[guessLen+1] = '\0';  // null char
+            newRemain[remainLen-1] = '\0';
+
+            string newGuessString = new string(newGuess).Trim('\0');
+            string newRemainString = new string(newRemain).Trim('\0');
+
+            if (newGuessString.Length > 3)
+            {
+                string str = ShitfLeftKill(newGuessString);
+                if (Dlb_lookup(dlbHead, str))
+                {
+                    head = Push(head, str);
+                }
+            }
+
+            if (newRemainString.Length !=0 )
+            {
+                //Ag(head, dlbHead, newGuess.ToString(), newRemain.ToString());
+                head = Ag(head, dlbHead, newGuessString, newRemainString);
+
+                for (int i = totalLen-1 ; i>0 ; i--)
+                {
+                    if (newRemainString.Length >i)
+                    {
+                        //newRemain = ShiftLeft(newRemain.ToString()).ToCharArray();
+                        //Ag(head, dlbHead, newGuess.ToString(), newRemain.ToString());
+                        newRemainString = ShiftLeft(newRemainString);
+                        head = Ag(head, dlbHead, newGuessString, newRemainString);
+                    }
+                }
+            }
+            return head;
+        }
+
+    // point randomly in the dictionary and then read words until a word >=7 letters if found (ie 7 or 8)
+        public static string GetRandomWord()
+        {
+            string filename = DictPathLanguage() + "wordlist.txt";
+            int lineCount = File.ReadLines(filename).Count();
+
+            Random rnd = new Random();
+            int randomPos = rnd.Next(0, lineCount-1);
+            int lineNum = randomPos;
+            //string line = File.ReadLines(filename).Skip(randomPos - 1);
+
+            StreamReader sr = new StreamReader(filename);
+            //for (int i=0; i<randomPos; i++) sr.ReadLine();   // jump to the random line 
+            
+            string? line = "";
+            while (line.Length < 7 || line == null)
+            {
+                /*line = sr.ReadLine();
+                if (line == "") sr.*/
+
+                line = File.ReadLines(filename).ElementAtOrDefault(lineNum++);
+                if (line == null) lineNum = 0; // if we have reached the end of the file loop back and continue from the begining.
+            }
+
+            return line;
+        }
+
+    }
+}

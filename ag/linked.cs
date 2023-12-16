@@ -6,8 +6,8 @@ namespace ag
         public class Node
         {
             public string? anagram;
-            public int found;
-            public int guessed;
+            public bool found;
+            public bool guessed;
             public int length;
             public Node? next;
         }
@@ -64,11 +64,10 @@ namespace ag
         }
 
         // method to reset the answers
-        // from linked.c
         public void DestroyAnswers(Node? nodeHead)
         {
             Node? current = nodeHead;
-            Node? previous = nodeHead;
+            Node? previous;// = nodeHead;
 
             while (current != null)
             {
@@ -82,7 +81,7 @@ namespace ag
 
         // method to add a new word as long as it is not a duplicate
         // from linked.c
-        public void Push(Node headRef, string anagram)
+        public static Node Push(Node headRef, string anagram)
         {
             Node? current = new Node();
             current = headRef;
@@ -91,7 +90,7 @@ namespace ag
 
             while (current != null)
             {
-                if (!string.Equals(anagram, current.anagram))
+                if (string.Equals(anagram, current.anagram))
                 {
                     duplicate = true;
                     break;
@@ -105,13 +104,13 @@ namespace ag
                 len = anagram.Length;
                 newNode.anagram = anagram;
                 newNode.length = len;
-                newNode.found = 0;
-                newNode.guessed = 0;
+                newNode.found = false;
+                newNode.guessed = false;
                 newNode.next = headRef;
 
                 headRef = newNode;
             }
-
+            return headRef;
         }
     }
 }

@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "cBlHeRRl3Q0ReBW4/xe/O6y5wpfisAoRTpYeeXH6PL1ADM28XhNAVOpEWhE2XlUcXAHrl82G931WKrFkJwBdOA==",
+  "dgSpecHash": "+DVb5hY3wbgqdWT46cTnFEehSYoJZIwJYqVUr0yXY6vr3yuJoJNXh3aG1m1tNI4e36Ffx66/zewk3cVMQcWbFg==",
   "success": true,
   "projectFilePath": "C:\\Users\\guill\\Documents\\Coding\\Anagramarama\\anagramarama-cs2\\ag\\ag.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\guill\\.nuget\\packages\\sayers.sdl2.core\\1.0.11\\sayers.sdl2.core.1.0.11.nupkg.sha512"
+  ],
   "logs": []
 }
