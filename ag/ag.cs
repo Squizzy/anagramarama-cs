@@ -1,12 +1,13 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using SDL2;
 
 namespace ag
 {
     partial class Program
     {
-        public static IntPtr backgroundTex;
+        // public static IntPtr backgroundTex;
         public struct Box
         {
             public int x;
@@ -29,7 +30,7 @@ namespace ag
         string[] boxnames = {"solve", "new", "quit", "shuffle", "enter", "clear"};
 
 
-        private static void newGame(Node answers, dlb_node dict, IntPtr screen, Sprite letters)
+        private static void newGame(Node answers, dlb_node dict, IntPtr backgroundTex, IntPtr screen, Sprite letters, char[] rootWord)
         {
             // letters in the guess box
             char[] guess = new char[9];
@@ -43,7 +44,25 @@ namespace ag
 	        dest.w = 800;
 	        dest.h = 600;
             //IntPtr temp = BackgroundText
-	        SDLScale_RenderCopy(screen, ref backgroundTex, ref null, ref dest);
+
+            SDL.SDL_Rect firstrect;
+            firstrect.x = 0;
+            firstrect.y = 0;
+            firstrect.w = 800;
+            firstrect.h = 600;
+            
+	        SDLScale_RenderCopy(screen, backgroundTex, ref firstrect, ref dest);
+            
+            destroyLetters(letters);
+
+            while (!happy)
+            {
+                char[] buffer = new char[9];
+                buffer = GetRandomWord().ToCharArray();
+                guess = "".ToCharArray();
+                rootWord = buffer;
+             //   ### here
+            }
 
             
             // setup the list of anagrams based on rootWord. Original game does not want more than 66 anagrams.
@@ -76,6 +95,7 @@ namespace ag
 
 
         }
+
 
     }
 }

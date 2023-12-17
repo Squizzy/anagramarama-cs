@@ -12,10 +12,17 @@ namespace ag
             mouseEvent.button.y = mouseEvent.button.y / (int)scaleh;
         }
 
-        public void SDLScale_RenderCopy (IntPtr renderer, ref IntPtr texture, ref SDL.SDL_Rect? srcRect, ref SDL.SDL_Rect? dstRect)
+//        public void SDLScale_RenderCopy (IntPtr renderer, ref IntPtr texture, SDL.SDL_Rect srcRect, ref SDL.SDL_Rect? dstRect)
+        public static void SDLScale_RenderCopy (IntPtr renderer, IntPtr texture, ref SDL.SDL_Rect srcRect, ref SDL.SDL_Rect dstRect)
         {
             SDL.SDL_Rect dstReal;
-            if (dstRect.HasValue)
+                dstReal.x = dstRect.x;
+                dstReal.y = dstRect.y;
+                dstReal.h = dstRect.h;
+                dstReal.w = dstRect.w;
+                SDL.SDL_RenderCopy(renderer,  texture, ref srcRect,  ref dstRect);
+            
+ /*           if (dstRect.HasValue)
             {
                 dstReal.x = dstRect.Value.x * (int)scalew;
                 dstReal.y = dstRect.Value.y * (int)scaleh;
@@ -30,10 +37,10 @@ namespace ag
                 dstReal.h = dstRect.Value.h;
                 dstReal.w = dstRect.Value.w;
                 SDL.SDL_RenderCopy(renderer,  texture, ref srcRect, ref dstReal);
-            }
+            }*/
         }
 
-        public void SDLScale_set(double w, double h)
+        public static void SDLScale_set(double w, double h)
         {
             scalew = w;
             scaleh = h;

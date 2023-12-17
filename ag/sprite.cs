@@ -12,14 +12,27 @@ namespace ag
         }
         public class Sprite
         {
-            Element spr;
-            int numSpr;
+            public Element? spr;
+            public int numSpr;
             char letter;
             int x, y, w, h;
-            Sprite next;
+            public Sprite next;
             int index;
             int box;
 
+        }
+
+        public static void destroyLetters(Sprite? letters)
+        {
+             Sprite? current = letters;
+            while (current != null) {
+                Sprite? tmp = current;
+                if (current.numSpr > 0)
+                    current.spr = null;
+                current = current.next;
+                tmp = null;
+            }
+	        letters = null;
         }
 
     }

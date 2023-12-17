@@ -21,7 +21,7 @@ namespace ag
         {
             string path = "i18n/";
             //if (!myDEBUGmacos) path = "i18n/"; 
-            #if DEBUG
+            #if notDEBUG
                 path = "../../../" + path;
             #endif
 
@@ -77,7 +77,11 @@ namespace ag
                                         SDL.SDL_WINDOWPOS_UNDEFINED, 
                                         800, 600, 
                                         SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
-            if (window == null) Console.WriteLine($"There was an issue creating the 800x600 window. {SDL.SDL_GetError()}");  
+            if (window == null) 
+            {
+                Console.WriteLine($"There was an issue creating the 800x600 window. {SDL.SDL_GetError()}");  
+            }
+            else Console.WriteLine("No issue creating the window");
                 
             // Creates a new SDL hardware renderer in that window using the default graphics device with VSYNC enabled.
             IntPtr renderer = SDL.SDL_CreateRenderer(window, 
@@ -93,11 +97,11 @@ namespace ag
 
             // Switches out the currently presented render surface with the one we just did work on.
             SDL.SDL_RenderPresent(renderer);
-
+Console.WriteLine("Renderer started ");
             // cache in-game graphics
             // Load the background image as texture in SDL, and set it as the texture for background
             string backgroundImage = dictonaryPathLanguage + "images/background.png";
-            backgroundTex = SDL.SDL_CreateTextureFromSurface(renderer, SDL_image.IMG_Load(backgroundImage));
+            IntPtr backgroundTex = SDL.SDL_CreateTextureFromSurface(renderer, SDL_image.IMG_Load(backgroundImage));
 
             // Load the large letter bank, small letter bank, and number bank
             string letterBankImage = dictonaryPathLanguage + "images/letterBank.png";
@@ -111,7 +115,8 @@ namespace ag
 
             // TO CHECK - load from the config.ini
 
-            newGame(head, dlbHead, renderer, letters);
+            char[] rootWord = new char[9];
+            newGame(head, dlbHead, backgroundTex, renderer, letters, rootWord);
 
 
 
