@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ag", "ag/ag.csproj", "{85DFFE1A-0D89-446A-8562-3A43996FB63F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ag", "ag\ag.csproj", "{CBB1CF0E-5D6B-4753-8FBC-6F2A058A5A16}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ag", "ag", "{3D8CEB14-6326-44D2-B69F-C435D02EF347}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitaryTests", "agUnitaryTests\UnitaryTests.csproj", "{BA26641F-8BDF-4FCE-9B58-3E2BDB85F81C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +18,17 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{85DFFE1A-0D89-446A-8562-3A43996FB63F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{85DFFE1A-0D89-446A-8562-3A43996FB63F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{85DFFE1A-0D89-446A-8562-3A43996FB63F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{85DFFE1A-0D89-446A-8562-3A43996FB63F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBB1CF0E-5D6B-4753-8FBC-6F2A058A5A16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBB1CF0E-5D6B-4753-8FBC-6F2A058A5A16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBB1CF0E-5D6B-4753-8FBC-6F2A058A5A16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBB1CF0E-5D6B-4753-8FBC-6F2A058A5A16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA26641F-8BDF-4FCE-9B58-3E2BDB85F81C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA26641F-8BDF-4FCE-9B58-3E2BDB85F81C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA26641F-8BDF-4FCE-9B58-3E2BDB85F81C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA26641F-8BDF-4FCE-9B58-3E2BDB85F81C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CBB1CF0E-5D6B-4753-8FBC-6F2A058A5A16} = {3D8CEB14-6326-44D2-B69F-C435D02EF347}
+		{BA26641F-8BDF-4FCE-9B58-3E2BDB85F81C} = {3D8CEB14-6326-44D2-B69F-C435D02EF347}
 	EndGlobalSection
 EndGlobal

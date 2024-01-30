@@ -13,7 +13,7 @@ namespace ag
         }
 
         // method to count the length of the linked list
-        public int Length(Node nodeHead)
+        public static int Length(Node nodeHead)
         {
             Node? current = new Node();
             current = nodeHead;
@@ -28,7 +28,7 @@ namespace ag
         }
 
         // method to swap the content from two linkedlist nodes without changing the position of the node
-        public void Swap(Node nodeFrom, Node nodeTo)
+        public static void Swap(ref Node nodeFrom, ref Node nodeTo)
         {
             string? word = nodeFrom.anagram;
             int len = nodeFrom.length;
@@ -40,7 +40,7 @@ namespace ag
         }
 
         // method to sort the list first alphabetically then by increasing word length
-        public void Sort(Node nodeHead)
+        public static void Sort(ref Node nodeHead)
         {
             Node? left, right;
             bool completed = false;
@@ -54,12 +54,30 @@ namespace ag
                 {
                     if (String.Compare(left.anagram, right.anagram) >0)
                     {
-                        Swap(left, right);
+                        Swap(ref left, ref right);
                         completed = false;
-                        left = left.next;
-                        right = right.next;
                     }
+                    left = left.next;
+                    right = right.next;
                 } while ((left != null) && (right != null));
+            }
+
+            completed = false;
+            while (!completed)
+            {
+                left = nodeHead;
+                right = left.next;
+                completed = true;
+                do
+                {
+                    if (left.length > right.length)
+                    {
+                        Swap(ref left, ref right);
+                        completed = false;
+                    }
+                    left = left.next;
+                    right = right.next;
+                } while ((left != null) && (right != null));             
             }
         }
 

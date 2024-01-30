@@ -5,12 +5,26 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <!-- the below removes the build error message when the UnitaryTest folder is under the main src folder, which cause issue for the bin and obj folders -->
+    <!-- see https://github.com/dotnet/core/issues/4837 -->
+    
+    <!--<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute> -->
+
+    <!-- The below are hand defined during testing time to have one dedicated file for units testing-->
+    <!-- Now obsolete with unitary testing method using NUnit below -->
+    <!-- <DefineConstants>NOTUNITS_TESTS</DefineConstants> -->
     <!-- hand defined during testing time to have one dedicated file for units testing-->
-    <DefineConstants>NOTUNITS_TESTS</DefineConstants> 
-    <!-- hand defined during testing time to have one dedicated file for units testing-->
+    
+    <!-- the below allow the extration of the xml documentation from the source files and create a ag.xml at each build-->
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!--end extraction of xml documentation-->
+
   </PropertyGroup>
   
-    <ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Sayers.SDL2.Core" Version="1.0.11" />
   </ItemGroup>
 

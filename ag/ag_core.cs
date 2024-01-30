@@ -7,10 +7,10 @@ namespace ag
 {
     partial class Program
     {
-        static char SPACE_CHAR = '#';
+        const char SPACE_CHAR = '#';
 
         // returns the first occurrence of SPACE_CHAR in a string
-        public static int? NextBlank(string thisString)
+        public static int NextBlank(string thisString)
         {
             return thisString.IndexOf(SPACE_CHAR);
         }
@@ -29,7 +29,7 @@ namespace ag
 
         // Generate all possible combinations of the root word "remain" the initial letter is fixed (save under "head"), so to work out all anagrams in the dictionarydlbHead, prefix with space.
         //public void Ag(Node head, dlb_node dlbHead, string guess, string remain)
-        public static Node Ag(Node head, dlb_node dlbHead, string guess, string remain)
+        public static Node Ag(ref Node head, dlb_node dlbHead, string guess, string remain)
         {
             char[] newRemain;
             int totalLen = 0, guessLen = 0, remainLen = 0;
@@ -64,7 +64,7 @@ namespace ag
             if (newRemainString.Length !=0 )
             {
                 //Ag(head, dlbHead, newGuess.ToString(), newRemain.ToString());
-                head = Ag(head, dlbHead, newGuessString, newRemainString);
+                head = Ag(ref head, dlbHead, newGuessString, newRemainString);
 
                 for (int i = totalLen-1 ; i>0 ; i--)
                 {
@@ -73,17 +73,23 @@ namespace ag
                         //newRemain = ShiftLeft(newRemain.ToString()).ToCharArray();
                         //Ag(head, dlbHead, newGuess.ToString(), newRemain.ToString());
                         newRemainString = ShiftLeft(newRemainString);
-                        head = Ag(head, dlbHead, newGuessString, newRemainString);
+                        head = Ag(ref head, dlbHead, newGuessString, newRemainString);
                     }
                 }
             }
             return head;
         }
 
-    // point randomly in the dictionary and then read words until a word >=7 letters if found (ie 7 or 8)
-        public static string GetRandomWord()
+        
+        /// <summary>
+        /// Get a random word in the dictionary file:
+        /// </summary>
+        /// <param name="wordsListPath">Variable that contains relative path additions, used esp for debug at time of development, taken as an args of Main()</param>
+        /// <returns>Returns the random word selected as a string</returns>
+        /// <remarks>point randomly in the dictionary and then read words until a word >=7 letters if found (ie 7 or 8)</remarks>
+        public static string GetRandomWord(string wordsListPath = "")
         {
-            string filename = DictPathLanguage() + "wordlist.txt";
+            string filename = DictPathLanguage(wordsListPath) + "wordlist.txt";
             int lineCount = File.ReadLines(filename).Count();
 
             Random rnd = new Random();

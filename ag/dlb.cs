@@ -63,6 +63,11 @@ namespace ag
         // This creates a new node and initialises it with a character - in reality probably not required with c# any more? -> use constructor instead would achieve the same
         // CHECK LATER
         **************/
+        /// <summary>
+        /// Creates a new dlb_node with the specified character and initializes its properties.
+        /// </summary>
+        /// <param name="c">The character for the new node.</param>
+        /// <returns>The newly created dlb_node.</returns>
         public static dlb_node Dlb_node_create_node(char c)
         {
             dlb_node newNode = new dlb_node();
@@ -110,8 +115,11 @@ namespace ag
             // method to load a new word into the dictionary link list, taking into account children and siblings possibilities.
             //
             **************/
-            public static void Dlb_push(dlb_node dlbHead, string word)
+            public static void Dlb_push(ref dlb_node dlbHead, string word)
             {
+                // TODO: SHOULD PROBABLY THROW AN EXCEPTION HERE
+                if (word.Length == 0) return;
+                
                 dlb_node? current = new dlb_node();
                 dlb_node? previous = new dlb_node();
                 current = dlbHead;
@@ -165,8 +173,14 @@ namespace ag
                 //}
             }
 
+            /// <summary>
+            /// This method is used to create a dictionary from a file. It reads each line of the file, adds the words to the dictionary, and sets the necessary links between nodes. 
+            /// </summary>
+            /// <param name="dlbHead">The head node of the dictionary.</param>
+            /// <param name="filename">The name of the file containing the dictionary words.</param>
+            
             // method to load the dictionary from the file
-            public static void Dlb_create(dlb_node dlbHead, string filename)
+            public static void Dlb_create(ref dlb_node dlbHead, string filename)
             {
                 int lineCount = File.ReadLines(filename).Count();
                 string? currentWord;
@@ -177,7 +191,7 @@ namespace ag
                     for (int i=0; i<lineCount; i++)
                     {
                         currentWord = sr.ReadLine();
-                        if (currentWord != null) Dlb_push(dlbHead, currentWord);
+                        if (currentWord != null) Dlb_push(ref dlbHead, currentWord);
                     }
                 }
                 catch(Exception e)

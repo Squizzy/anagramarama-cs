@@ -17,13 +17,13 @@ namespace ag
     partial class Program
     {
         // method to identify the local language path for the locale files (dictionarity, background, ...)
-        private static string DictPathLanguage()
+        private static string DictPathLanguage(string wordsListPath = "")
         {
-            string path = "i18n/";
+            string path = wordsListPath + "i18n/";
             //if (!myDEBUGmacos) path = "i18n/"; 
-            #if notDEBUG
+            /*#if notDEBUG
                 path = "../../../" + path;
-            #endif
+            #endif*/
 
             string lang;
             lang = System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag;
@@ -38,9 +38,25 @@ namespace ag
         }
 
         #if !UNITS_TESTS  // defined in ag.csproj
-        public static void Main()
+
+
+        public static void Main(string[] args)
         {
+            // Below use of args is "temporary" for debug time for now
+            string wordsListPath = "";
+            if (args != null && args.Length != 0)
+            {
+                foreach (string a in args)
+                {
+                    if (a.Substring(0,5) == "path=")
+                    {
+                        wordsListPath = a.Substring(5);
+                    }
+                }
+            }
             // initiate the reference to the first node for the list of anagrams
+                
+
             Node head = new Node();
             head = null;
 
@@ -58,11 +74,11 @@ namespace ag
 
             // find the local path with the IETF international code
             // TO CHECK - adjust for if using a command line, or using a configuration popup etc...
-            string dictonaryPathLanguage = DictPathLanguage();
+            string dictonaryPathLanguage = DictPathLanguage(wordsListPath);
 
             // load the dictionary
             // newLinkedList.dlb_create(newNode, dictonaryPathLanguage + "wordlist.txt");
-            Dlb_create(dlbHead, dictonaryPathLanguage + "wordlist.txt");
+            Dlb_create(ref dlbHead, dictonaryPathLanguage + "wordlist.txt");
             
             // Initiate SDL
             if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO | SDL.SDL_INIT_AUDIO | SDL.SDL_INIT_TIMER) < 0) 
@@ -112,16 +128,17 @@ Console.WriteLine("Renderer started ");
 
             string numberImage = dictonaryPathLanguage + "images/numberBank.png";
             IntPtr numberBank = SDL.SDL_CreateTextureFromSurface(renderer, SDL_image.IMG_Load(numberImage));
-
+Console.WriteLine("About to start newGame");
             // TO CHECK - load from the config.ini
 
             char[] rootWord = new char[9];
-            newGame(head, dlbHead, backgroundTex, renderer, letters, rootWord);
+            newGame(ref head, ref dlbHead, backgroundTex, renderer, letters, rootWord, wordsListPath);
+Console.WriteLine("Finished newGame");
 
 
 
-            Console.ReadLine();
-            Console.WriteLine("end");
+            //Console.ReadLine();
+            //Console.WriteLine("end");
         }
         #endif
     }

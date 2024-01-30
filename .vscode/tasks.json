@@ -19,10 +19,10 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/ag.sln",
+                "${workspaceFolder}/ag/ag.csproj",
+                "${workspac$eFolder}/ag.sln",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign",
-                "-c Release"
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -34,7 +34,8 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/ag.sln"
+                "${workspaceFolder}/ag/ag.csproj",
+                "${workspac$eFolder}/ag.sln"
             ],
             "problemMatcher": "$msCompile"
         }
