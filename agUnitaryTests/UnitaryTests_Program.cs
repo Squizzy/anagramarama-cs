@@ -31,7 +31,7 @@ public partial class Tests
 
             // Assert
             // Check if SDL is initialized successfully
-            Assert.AreEqual(0, SDL.SDL_Init(SDL.SDL_INIT_VIDEO | SDL.SDL_INIT_AUDIO | SDL.SDL_INIT_TIMER));
+            Assert.That(SDL.SDL_Init(SDL.SDL_INIT_VIDEO | SDL.SDL_INIT_AUDIO | SDL.SDL_INIT_TIMER), Is.EqualTo(0));
 
             // Check if the window is created successfully
             IntPtr window = SDL.SDL_CreateWindow("Anagramarama",

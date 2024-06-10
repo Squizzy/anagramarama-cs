@@ -59,7 +59,7 @@ public partial class Tests
             Program.ShuffleWord(word);
 
             // Assert
-            Assert.AreNotEqual(originalWord, word);
+            Assert.That(word, Is.Not.EqualTo(originalWord));
         }
 /*
         [Test, Category("CategoryC")]

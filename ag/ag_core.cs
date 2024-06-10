@@ -5,9 +5,10 @@ using System.Security.Cryptography;
 
 namespace ag
 {
+    
     partial class Program
     {
-        const char SPACE_CHAR = '#';
+       public static Random rnd;
 
         // returns the first occurrence of SPACE_CHAR in a string
         public static int NextBlank(string thisString)
@@ -92,7 +93,7 @@ namespace ag
             string filename = DictPathLanguage(wordsListPath) + "wordlist.txt";
             int lineCount = File.ReadLines(filename).Count();
 
-            Random rnd = new Random();
+            rnd = new Random();
             int randomPos = rnd.Next(0, lineCount-1);
             int lineNum = randomPos;
             //string line = File.ReadLines(filename).Skip(randomPos - 1);

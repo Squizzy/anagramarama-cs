@@ -45,6 +45,11 @@ namespace ag
             public bool valid; // indicates end of a word
             public dlb_node? sibling; //a letter that belongs to a new word which shares the same initial letters until this point.
             public dlb_node? child; // letter of the same word as previous word
+            public dlb_node()
+            {
+                letter = '\0';
+                valid = false;
+            }
 
         }
 
@@ -115,7 +120,7 @@ namespace ag
             // method to load a new word into the dictionary link list, taking into account children and siblings possibilities.
             //
             **************/
-            public static void Dlb_push(ref dlb_node dlbHead, string word)
+            public static void Dlb_push(ref dlb_node? dlbHead, string word)
             {
                 // TODO: SHOULD PROBABLY THROW AN EXCEPTION HERE
                 if (word.Length == 0) return;

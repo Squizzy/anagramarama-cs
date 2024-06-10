@@ -16,6 +16,10 @@ namespace ag
 {
     partial class Program
     {
+        /// <value> Property <c>letterBank</c> is the band of letter pic once loaded in the app</value>
+        public static IntPtr letterBank;
+        
+        
         // method to identify the local language path for the locale files (dictionarity, background, ...)
         private static string DictPathLanguage(string wordsListPath = "")
         {
@@ -121,7 +125,7 @@ Console.WriteLine("Renderer started ");
 
             // Load the large letter bank, small letter bank, and number bank
             string letterBankImage = dictonaryPathLanguage + "images/letterBank.png";
-            IntPtr letterBank = SDL.SDL_CreateTextureFromSurface(renderer, SDL_image.IMG_Load(letterBankImage));
+            letterBank = SDL.SDL_CreateTextureFromSurface(renderer, SDL_image.IMG_Load(letterBankImage));
             
             string smallLetterBankImage = dictonaryPathLanguage + "images/smallLetterBank.png";
             IntPtr smallLetterBank = SDL.SDL_CreateTextureFromSurface(renderer, SDL_image.IMG_Load(smallLetterBankImage));

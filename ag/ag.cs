@@ -8,16 +8,10 @@ using SDL2;
 
 namespace ag
 {
+
     public partial class Program
     {
         // public static IntPtr backgroundTex;
-        public struct Box
-        {
-            public int x;
-            public int y;
-            public int width;
-            public int height;
-        }
 
         Box[] hotbox = new Box []
         {
@@ -71,6 +65,8 @@ Console.WriteLine("About to look for Happy");
                 for (int i =0; i<rootWord.Length; i++) remain[i] = rootWord[i];
                 //remain =rootWord;
 
+                
+                // Not needed in C# as garbage collection is handled already
                 //destroyAnswers(answers);
 
                 answerSought = Length(answers);
@@ -106,34 +102,10 @@ Console.WriteLine("Happy found");
             remain[bigWordLen] = '\0';
 
             ShuffleWord(remain);
-            // HERE
+            shuffle = remain;
+            answer = SPACE_FILLED_STRING;
 
-
-            // setup the list of anagrams based on rootWord. Original game does not want more than 66 anagrams.
-            // TODO: Adjust with a variable?
-           /* string[] anagramsList = new string[66];
-
-            string rootWord;
-
-            int anagramsCount = 0;
-
-            while (!happy)
-            {
-                // First off, go pick a random 7-letter word from the dictionary
-                rootWord = GetRandomWord(dict);
-                //guess = "".ToCharArray();
-                Array.Clear(guess, 0, guess.Length);
-                Array.Clear(anagramsList, 0, anagramsList.Length);
-                anagramsCount = 0;
-                
-
-                // remaining letters in list of letter box is set to all the letters of rootWord.
-                remain = rootWord.ToCharArray();
-
-                Ag(anagramsList, dict, guess, remain);
-            }*/
-
-
+// HERE
 
 
 
@@ -173,5 +145,55 @@ Console.WriteLine("Happy found");
             }
 
         }
+
+
+        public static void BuildLetters(ref Sprite letters, IntPtr screen)
+        {
+            Sprite thisLetter = new Sprite();
+            Sprite previousLetter = new Sprite();
+            SDL.SDL_Rect rect = new SDL.SDL_Rect();
+            int index = 0;
+
+            rect.y = 0;
+            rect.w = GAME_LETTER_WIDTH;
+            rect.h = GAME_LETTER_HEIGHT;
+
+            int len = shuffle.Length;
+
+            for (int i=0; i<len; i++)
+
+            {
+                thisLetter.numSpr = 0;
+
+                // determine which letter we're wanting and load it from 
+                // the letterbank*/
+
+                if ((int)shuffle[i] != ASCII_SPACE && shuffle[i] != SPACE_CHAR )
+                {
+                    int chr = (int)(shuffle[i] - 'a');
+                    rect.x = chr * GAME_LETTER_WIDTH;
+                    thisLetter.numSpr = 1;
+
+
+                    thisLetter.spr[0].t = letterBank;
+                    thisLetter.spr[0].w = rect;
+                    thisLetter.spr[0].x = 0;
+                    thisLetter.spr[0].y = 0;
+
+
+                    thisLetter.x = rnd.Next(0, 799); // Dulsi comment did not seem to align with his code: i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X;
+                    thisLetter.y = rnd.Next(0, 599); // Dulsi comment did not seem to align with his code:  SHUFFLE_BOX_Y;
+                    thisLetter.letter = shuffle[i];
+                    thisLetter.h = GAME_LETTER_HEIGHT;
+                    thisLetter.w = GAME_LETTER_WIDTH;
+                    thisLetter.toX = i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X;
+                    thisLetter.toY = SHUFFLE_BOX_Y;
+                }
+            }
+
+
+
+        }
+// HERE TOO
     }
 }
