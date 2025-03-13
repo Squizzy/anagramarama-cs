@@ -16,3 +16,4 @@ ag/obj/
 agUnitaryTests/bin/
 agUnitaryTests/obj/
 ignore/
+.qodo
