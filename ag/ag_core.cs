@@ -10,19 +10,31 @@ namespace ag
     {
        public static Random rnd;
 
-        // returns the first occurrence of SPACE_CHAR in a string
+        /// <summary>
+        /// returns the first occurrence of SPACE_CHAR in a string
+        /// </summary>
+        /// <param name="thisString"></param>
+        /// <returns></returns>
         public static int NextBlank(string thisString)
         {
             return thisString.IndexOf(SPACE_CHAR);
         }
 
-        // shift a string one character to the left, truncating the leftmost character
+        /// <summary>
+        /// shift a string one character to the left, truncating the leftmost character
+        /// </summary>
+        /// <param name="thisString"></param>
+        /// <returns></returns>
         public static string ShitfLeftKill(string thisString)
         {
             return thisString.Remove(0,1);
         }
 
-        // shift a string one character to the left and move the first character to the end so it wraps around
+        /// <summary>
+        /// shift a string one character to the left and move the first character to the end so it wraps around
+        /// </summary>
+        /// <param name="thisString"></param>
+        /// <returns></returns>
         public static string ShiftLeft(string thisString)
         {
             return string.Concat(thisString.Remove(0,1) , thisString.Substring(0,1));
