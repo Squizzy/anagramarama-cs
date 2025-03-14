@@ -1,252 +1,257 @@
-using System.Runtime.InteropServices;
+using System.Dynamic;
 
 namespace ag
 {
     partial class Program
     {
-        /**************
-         dbl_node contains the key building blocks ("node") for the dictionary that is loaded from the text file provided. 
-         
-         each node contains:
-         - letter:  a letter that has been read from the dictionary file
-         - valid:   the indication that this letter is the end of a word
-         - child:   the link to the next "node" which, together with the previous nodes since the last valid, 
-                    and with all other children until the next valid, makes up a word
-         - sibling: the link to the next "node" for a new word that uses the same letters that have been used until now, 
-                    with its letter replacing the current node's for that word. ie "branches out" into a new word
 
-         e.g.
-            "head node" (nothing) 
-                -> child -
-                -> sibling 'a'
-                    -> child 'b'
-                        -> child 'b'
-                            -> child 'a'
-                                -> child 'c'
-                                    -> child 'i' 
-                                        -> child -, valid -> word "abaci"
-                                        -> sibling 'k', valid -> word "aback"
-                                            -> child -
-                                            -> sibling 'u'
-                                                -> child s
-                                                    -> child -, sibling -, valid -> word "abacus"
-                                                -> sibling -
-                                -> sibling 'f'
-                                    -> child 't'
-                                        -> child -, valid -> word "abaft"
-                                    
-                    -> sibling 'b' -> start of words starting with 'b'         
-
-        **************/
-
-        public class dlb_node
-        {
-            public char letter;
-            public bool valid; // indicates end of a word
-            public dlb_node? sibling; //a letter that belongs to a new word which shares the same initial letters until this point.
-            public dlb_node? child; // letter of the same word as previous word
-            public dlb_node()
-            {
-                letter = '\0';
-                valid = false;
-            }
-
-        }
-
-        // dlb_linkedlist contains the whole dictionary, a collection of linked dbl_nodes. However it is not needed in c# ?
-        // from dlb.c
-        /*public class dlb_linkedlist
-        {*/
-
-        // define a root node so we can easily point to the begining of the dictionary
-        // but not sure I'll use it
-        // CHECK LATER
-        private dlb_node head = null; 
-        
-
-        /**************
-        // This creates a new node and initialises it with a character - in reality probably not required with c# any more? -> use constructor instead would achieve the same
-        // CHECK LATER
-        **************/
         /// <summary>
-        /// Creates a new dlb_node with the specified character and initializes its properties.
+        /// Constructor for Dlb_node node
+        /// Creates a new Dlb_node with the specified character and initializes its properties. 
+        /// Not really needed in c# but kept for sake of keeping...
         /// </summary>
         /// <param name="c">The character for the new node.</param>
-        /// <returns>The newly created dlb_node.</returns>
-        public static dlb_node Dlb_node_create_node(char c)
+        /// <returns>The newly created Dlb_node</returns>
+        public static Dlb_node Dlb_node_create_node(char c)
         {
-            dlb_node newNode = new dlb_node();
-            newNode.letter = c;
-            newNode.valid = false;
-            newNode.sibling = null;
-            newNode.child = null;
+            Dlb_node newNode = new()
+            {
+                letter = c,
+                valid = false,
+                sibling = null,
+                child = null
+            };
             return newNode;
         }
-        /*}*/
 
-        /**************
-        //
-        // typeset to define dbl_node_operation used only in the method below
-        // not sure why it was used, maybe problems with overloading?
-        // CHECK LATER
-        //
-        **************/
-        public delegate int dlb_node_operation(dlb_node node);  
+        /// <summary>
+        /// Destructor for a Dlb_node node. 
+        /// Not really needed in c# but kept for sake of keeping...
+        /// </summary>
+        /// <param name="Node">The node to be cleared</param>
+        /// <returns>Nothing</returns>
 
-        /**************
-        //
-        // method that goes through the whole dictonary and lists the words
-        // takes the dictionary as input "node", and recursively goes through the whole of it.
-        // This is used in the latest dulsi version of anagramarama to clear the whole of the dictionary linked list. (the op operation called was to memfree the current node)
-        // probably not required here as there is no need to manuall free memory in c# 
-        //
-        **************/
-        public static void Dlb_walk(dlb_node? node, dlb_node_operation op)
+        public static void Dlb_free_node(Dlb_node? Node)
+        {
+            Node = null;
+        }
+
+
+        /// <summary>
+        /// Walk through the whole of the dictionary linkedlist and perform the op delegate on the node
+        /// In this particular application, op is called to free the node
+        /// This method just walks the whole linkedlist and clears all the nodes.
+        /// Not really needed in c# but kept for sake of keeping...
+        /// </summary>
+        /// <param name="node">The node to be freed</param>
+        /// <param name="op">The method to be called to be applied to the node (in this app: free the memory)</param>
+        /// <returns>Nothing</returns>
+        public static void Dlb_walk(ref Dlb_node? node, Dlb_node_operation op)
         {
             while (node != null)
             {
-                dlb_node tempNode = node;
+                Dlb_node tempNode = node;
                 if (node.child != null)
                 {
-                    Dlb_walk(node.child, op);
+                    Dlb_walk(ref node.child, op);
                 }
                 node = node.sibling;
                 op(tempNode);
             }
         }
+
+        /// <summary>
+        /// Frees each Dlb_node node of the dictionary linked list
+        /// Not really needed in c# but kept for sake of keeping...
+        /// </summary>
+        /// <param name="headNode">The headnode of the dictionary to clear</param>
+        /// <returns>Nothing</returns>
+        public static void Dlb_free(ref Dlb_node? headNode)
+        {
+            Dlb_walk(ref headNode, Dlb_free_node);
+        }
+
         
-            /**************
-            //
-            // method to load a new word into the dictionary link list, taking into account children and siblings possibilities.
-            //
-            **************/
-            public static void Dlb_push(ref dlb_node? dlbHead, string word)
+        /// <summary>
+        /// add a new word to the De La Briandais Trie Dlb dicionary linked list
+        /// load a new word into the dictionary link list, taking into account children and siblings possibilities.
+        /// </summary>
+        /// <param name="dlbHead">The head node of the dictionary</param>
+        /// <param name="word">The word to insert in the linked list</param>
+        /// <returns>Nothing</returns>
+        public static void Dlb_push(ref Dlb_node? dlbHead, string word)
+        {
+            Dlb_node? current = dlbHead;
+            Dlb_node? previous = null;
+            bool child = false;
+            bool sibling = false;
+            bool newHead = dlbHead == null;
+
+            while (word.Length > 0)
             {
-                // TODO: SHOULD PROBABLY THROW AN EXCEPTION HERE
-                if (word.Length == 0) return;
-                
-                dlb_node? current = new dlb_node();
-                dlb_node? previous = new dlb_node();
-                current = dlbHead;
-                previous = null;
-                bool child = false;
-                bool sibling = false;
-                bool newHead = (dlbHead == null);
+                char letter = word[0];
 
-                int currentWordLetterNum=0;
-                char[] letters = word.ToCharArray();
-                
-                do
+                if (current == null)
+                // This position can be reached when starting a new head (new dictionary linked list), 
+                // or current had been set to previous - which means child or sibling will have been set
                 {
-                    char letter = letters[currentWordLetterNum];
-                    if (current==null)
+                    current = Dlb_node_create_node(letter);
+                    if (newHead)
                     {
-                        current = Dlb_node_create_node(letter);
-                        if (newHead)
-                        {
-                            dlbHead = current;
-                            newHead = false;
-                        }
-                        if (child)
-                        {
-                            previous.child = current;
-                        }
-                        if (sibling)
-                        {
-                            previous.sibling = current;
-                        }
+                        dlbHead = current;
+                        newHead = false;
                     }
-                    child = false;
-                    sibling = false;
-                    previous = current;
+                    if (child)
+                    {
+                        previous.child = current;
+                    }
+                    if (sibling)
+                    {
+                        previous.sibling = current;
+                    }
 
-                    if (letter == previous.letter)
-                    {
-                        currentWordLetterNum++;
-                        child = true;
-                        current = previous.child;
-                    }
-                    else
-                    {
-//                        Console.WriteLine("found a sibling at letter count: " + currentWordLetterNum);
-                        sibling = true;
-                        current = previous.sibling;
-                    }
-                } while (currentWordLetterNum < word.Length);
+                }
+
+                // Reset the detection of child or sibling
+                child = false;
+                sibling = false;
+                // and set the previous node to the current one.
+                previous = current;
+
+                // if the current letter already exists in the tree, we are on a child, then move to the next letter
+                if (letter == previous.letter)
+                {
+                    // currentWordLetterNum++;
+                    // Move to the next letter in the word (remove the first letter of the word)
+                    word = word[1..];
+                    // Declare that we are working with a child
+                    child = true;
+                    // set the current node to the child of the previous node (node will be null but the "child" will be set)
+                    current = previous.child;
+                }
+                // Otherwise we are on a sibling
+                else
+                {
+                    //                        Console.WriteLine("found a sibling at letter count: " + currentWordLetterNum);
+                    // declare that we are working with a sibling
+                    sibling = true;
+                    // set the current not to the sibling of the previous node (node will be null but the "sibling" will be set)
+                    current = previous.sibling;
+                }
+                // } while (currentWordLetterNum < word.Length);
 
                 previous.valid = true;
                 //}
             }
+        }
 
-            /// <summary>
-            /// This method is used to create a dictionary from a file. It reads each line of the file, adds the words to the dictionary, and sets the necessary links between nodes. 
-            /// </summary>
-            /// <param name="dlbHead">The head node of the dictionary.</param>
-            /// <param name="filename">The name of the file containing the dictionary words.</param>
-            
-            // method to load the dictionary from the file
-            public static void Dlb_create(ref dlb_node dlbHead, string filename)
+
+        /// <summary>
+        /// This method is used to create a dictionary linked list from a file. 
+        /// It reads each line of the file, adds the words to the dictionary, and sets the necessary links between nodes. 
+        /// </summary>
+        /// <param name="dlbHead">The head node of the dictionary.</param>
+        /// <param name="filename">The name of the file containing the dictionary words.</param>
+        /// <returns>Nothing</returns>
+
+        public static void Dlb_create(ref Dlb_node? dlbHead, string filename)
+        {
+            int lineCount = File.ReadLines(filename).Count();
+            string? currentWord;
+            using StreamReader sr = new(filename);
+
+            try
             {
-                int lineCount = File.ReadLines(filename).Count();
-                string? currentWord;
-                StreamReader sr = new StreamReader(filename);
-
-                try
+                for (int i = 0; i < lineCount; i++)
                 {
-                    for (int i=0; i<lineCount; i++)
+                    currentWord = sr.ReadLine();
+                    if (currentWord != null)
                     {
-                        currentWord = sr.ReadLine();
-                        if (currentWord != null) Dlb_push(ref dlbHead, currentWord);
+                        Dlb_push(ref dlbHead, currentWord);
                     }
                 }
-                catch(Exception e)
-                {
-                    Console.WriteLine("Exception: " + e.Message);
-                }
-                finally
-                {
-                    Console.WriteLine("executing final block");
-                }
-                sr.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: " + e.Message);
+            }
+            finally
+            {
+                Console.WriteLine("executing final block");
             }
 
-            // method to looksup a word in the linked list (dictionary)
-            public static bool Dlb_lookup(dlb_node dlbHead, string word)
+        }
+
+        // method to looksup a word in the linked list (dictionary)
+
+        /// <summary>
+        /// Determine if a given word is in the dictionary 
+        /// essentially the same as a push, but doesn't add any of the new letters
+        /// </summary>
+        /// <param name="dlbHead">the dictionary linked list</param>
+        /// <param name="word">the word to find</param>
+        /// <returns> return true if the word is in the dictionary else return false </returns>
+        public static bool Dlb_lookup(Dlb_node? dlbHead, string word)
+        {
+            Dlb_node? current = dlbHead;
+            Dlb_node? previous;
+            // bool retval = false;
+            bool wordInDictionary = false;
+
+            while (word.Length > 0)
             {
-                dlb_node? current = dlbHead;
-                dlb_node? previous = null;
-                bool retval = false;
+                char letter = word[0];
 
-
-                int currentWordLetterNum=0;
-                char[] letters = word.ToCharArray();
-                
-                do
+                if (current == null)
                 {
-                    char letter = letters[currentWordLetterNum];
-                    if (current==null)
-                    {
-                        retval = false;
-                        break;
-                    }
+                    return wordInDictionary;
+                }
 
-                    previous = current;
+                previous = current;
 
-                    if (letter == previous.letter)
-                    {
-                        currentWordLetterNum++;
-                        current = previous.child;
-                        retval = previous.valid;
-                    }
-                    else
-                    {
-                        current = previous.sibling;
-                        retval = false;
-                    }
-                } while (currentWordLetterNum < word.Length);
-
-                return retval;
+                if (letter == previous.letter)
+                {
+                    word = word[1..];
+                    current = previous.child;
+                    wordInDictionary = previous.valid;
+                }
+                else
+                {
+                    current = previous.sibling;
+                    wordInDictionary = false;
+                }
             }
-//        }
+
+            return wordInDictionary;
+
+            // int currentWordLetterNum = 0;
+            // char[] letters = word.ToCharArray();
+
+            // do
+            // {
+            //     char letter = letters[currentWordLetterNum];
+            //     if (current == null)
+            //     {
+            //         retval = false;
+            //         break;
+            //     }
+
+            //     previous = current;
+
+            //     if (letter == previous.letter)
+            //     {
+            //         currentWordLetterNum++;
+            //         current = previous.child;
+            //         retval = previous.valid;
+            //     }
+            //     else
+            //     {
+            //         current = previous.sibling;
+            //         retval = false;
+            //     }
+            // } while (currentWordLetterNum < word.Length);
+
+            // return retval;
+        }
     }
 }
