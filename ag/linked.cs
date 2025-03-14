@@ -104,7 +104,7 @@ namespace ag
         /// <param name="headNode"></param>
         /// <param name="new_anagram">The word to add to the list</param>
         /// <returns>Nothing as the linkedlist itself is modified</returns>
-        public static void Push(Node headNode, string new_anagram)
+        public static void Push(ref Node headNode, string new_anagram)
         {
             Node? current = headNode;
             // int len;
