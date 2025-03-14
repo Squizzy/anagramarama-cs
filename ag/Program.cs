@@ -21,7 +21,7 @@ namespace ag
         
         
         // method to identify the local language path for the locale files (dictionarity, background, ...)
-        private static string DictPathLanguage(string wordsListPath = "")
+        private static string DictLanguagePath(string wordsListPath = "")
         {
             string path = wordsListPath + "i18n/";
             //if (!myDEBUGmacos) path = "i18n/"; 
@@ -78,7 +78,7 @@ namespace ag
 
             // find the local path with the IETF international code
             // TO CHECK - adjust for if using a command line, or using a configuration popup etc...
-            string dictonaryPathLanguage = DictPathLanguage(wordsListPath);
+            string dictonaryPathLanguage = DictLanguagePath(wordsListPath);
 
             // load the dictionary
             // newLinkedList.dlb_create(newNode, dictonaryPathLanguage + "wordlist.txt");
