@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using SDL2;
 
 namespace ag
@@ -6,45 +7,45 @@ namespace ag
     {
         static double scalew = 1;
         static double scaleh = 1;
+
+        /// <summary> identify the location of the mouse event if the window was scaled </summary>
+        /// <param name="mouseEvent">the mouse event</param>
+        /// <returns>Nothing</returns>
         public void SDLScale_MouseEvent(SDL.SDL_Event mouseEvent)
         {
             mouseEvent.button.x = mouseEvent.button.x / (int)scalew;
             mouseEvent.button.y = mouseEvent.button.y / (int)scaleh;
         }
 
-//        public void SDLScale_RenderCopy (IntPtr renderer, ref IntPtr texture, SDL.SDL_Rect srcRect, ref SDL.SDL_Rect? dstRect)
-        public static void SDLScale_RenderCopy (IntPtr renderer, IntPtr texture, ref SDL.SDL_Rect srcRect, ref SDL.SDL_Rect dstRect)
+    
+        /// <summary> scales a texture according to the requirements </summary>
+        /// <param name="renderer">The renderer on which the scaling happens</param>
+        /// <param name="texture">The texture to scale</param>
+        /// <param name="srcRect">The original size, if any</param>
+        /// <param name="dstRect">The scaled rectangle</param>
+        /// <returns>Nothing</returns>
+        public static void SDLScale_RenderCopy(IntPtr renderer, IntPtr texture, ref SDL.SDL_Rect srcRect, ref SDL.SDL_Rect dstRect)
         {
             SDL.SDL_Rect dstReal;
-                dstReal.x = dstRect.x;
-                dstReal.y = dstRect.y;
-                dstReal.h = dstRect.h;
-                dstReal.w = dstRect.w;
-                SDL.SDL_RenderCopy(renderer,  texture, ref srcRect,  ref dstRect);
-            
- /*           if (dstRect.HasValue)
-            {
-                dstReal.x = dstRect.Value.x * (int)scalew;
-                dstReal.y = dstRect.Value.y * (int)scaleh;
-                dstReal.h = dstRect.Value.h * (int)scaleh;
-                dstReal.w = dstRect.Value.w * (int)scalew;
-                SDL.SDL_RenderCopy(renderer,  texture, ref srcRect,  ref dstReal);
-            }
-            else
-            {
-                dstReal.x = dstRect.Value.x;
-                dstReal.y = dstRect.Value.y;
-                dstReal.h = dstRect.Value.h;
-                dstReal.w = dstRect.Value.w;
-                SDL.SDL_RenderCopy(renderer,  texture, ref srcRect, ref dstReal);
-            }*/
+            // if (dstRect != null)
+            // {
+            dstReal.x = (int)(dstRect.x * scalew);
+            dstReal.y = (int)(dstRect.y * scaleh);
+            dstReal.h = (int)(dstRect.h * scaleh);
+            dstReal.w = (int)(dstRect.w * scalew);
+            // TODO: Handle error check
+            _ = SDL.SDL_RenderCopy(renderer, texture, ref srcRect, ref dstReal);
+
         }
 
+        /// <summary> applies the scaling factor in run-time changes </summary>
+        /// <param name="w">width factor</param>
+        /// <param name="h">height factor</param>
+        /// <returns>Nothing</returns>
         public static void SDLScale_set(double w, double h)
         {
             scalew = w;
             scaleh = h;
         }
-
     }
 }
