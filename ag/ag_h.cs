@@ -94,49 +94,5 @@ namespace ag
         /// <summary> Path to the locale dictionary </summary>
         public const string DEFAULT_LOCALE_PATH = "i18n/en_GB";
 
-
-
-
-        // shuffle is an array that can be modified so it needs to have a field that is set and get
-        /// <summary>Represents a shuffled array of characters.</summary>
-        private static readonly char[] _shuffle = new char[8];
-
-        /// <summary>Gets or sets the shuffled array of characters.</summary>
-        public static char[] Shuffle
-        {
-            get { return _shuffle; }
-            set
-            {
-                if (value != null && value.Length == _shuffle.Length)
-                {
-                    value.CopyTo(_shuffle, 0);
-                }
-                else
-                {
-                    throw new ArgumentException($"Array must be of length {_shuffle.Length}.");
-                }
-            }
-        }
-
-        // answer is an array that can be modified so it needs to have a field that is set and get
-        /// <summary>Represents an answer array of characters.</summary>
-        public static readonly char[] _answer = new char[8];
-
-        /// <summary>Gets or sets the answer array of characters.</summary>
-        public static char[] Answer
-        {
-            get { return _answer; }
-            set
-            {
-                if (value != null && value.Length == _answer.Length)
-                {
-                    value.CopyTo(_answer, 0);
-                }
-                else
-                {
-                    throw new ArgumentException($"Array must be of length {_answer.Length}.");
-                }
-            }
-        }
     }
 }
