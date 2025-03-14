@@ -30,11 +30,11 @@ namespace ag
         {
             /// <value> Property <c>t</c> texture of the sprite </value>
             /// <remarks>(SDL_Texture *t) For some reason SDL2.SDL.SDL_Texture has not been defined in for c#, so using IntPtr</remarks>
-            public IntPtr t;
-            /// <value>Property <c>w</c> represent the displacement horizontally in t from the start position to find the letter</value>
-            public SDL.SDL_Rect w;
-            /// <value>Property <c>x, y</c> represent the start position in t to find the letter</value>
-            public int x, y;
+            public IntPtr texture;
+            /// <value>Property <c>w</c> dimensions of the image</value>
+            public SDL.SDL_Rect sprite_dimensions;
+            /// <value>Property <c>x, y</c> letter offset from the top left position of the band image</value>
+            public int x_offset, y_offset;
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace ag
         public class Sprite
         {
             /// <value> Property <c>spr</c> The graphical representation </value>
-            public Element[] spr;
+            public required Element[] spr;
             /// <value> Property <c>numSpr</c> **??** </value>
             public int numSpr;
             /// <value> Property <c>letter</c> the actual letter value </value>
