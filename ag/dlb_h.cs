@@ -62,10 +62,13 @@ namespace ag
 
         // typedef int (*dlb_node_operation)(struct dlb_node *node);
         
-        /// <summary> Delegate for operations on a Dlb_node. </summary>
+        /// <summary>
+        /// Delegate for operations on a Dlb_node.
+        /// Modified to return nothing as the original app did not make use of the return value anyway
+        /// </summary>
         /// <param name="node">The Dlb_node to operate on.</param>
-        /// <returns>An integer result of the operation.</returns>
-        public delegate int Dlb_node_operation(Dlb_node node);
+        /// <returns>Nothing</returns>
+        public delegate void Dlb_node_operation(Dlb_node node);
 
     }
 }
