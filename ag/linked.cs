@@ -2,21 +2,14 @@ namespace ag
 {
     partial class Program
     {
-        // node contains ???
-        public class Node
-        {
-            public string? anagram;
-            public bool found;
-            public bool guessed;
-            public int length;
-            public Node? next;
-        }
 
-        // method to count the length of the linked list
-        public static int Length(Node nodeHead)
+        /// <summary> returns the number of anagrams from the root word </summary>
+        /// <param name="headNode">pointer to the first node</param>
+        /// <returns> integer value of the number of anagrams in the list </returns>
+        public static int Length(Node headNode)
         {
-            Node? current = new Node();
-            current = nodeHead;
+            Node? current = new();
+            current = headNode;
             int count = 0;
 
             while (current != null)
@@ -27,48 +20,58 @@ namespace ag
             return count;
         }
 
-        // method to swap the content from two linkedlist nodes without changing the position of the node
-        public static void Swap(ref Node nodeFrom, ref Node nodeTo)
+        /// <summary> 
+        /// swap the content from two linkedlist nodes without changing the position of the node 
+        /// This is used when sorting the list alphabetically and by anagram's length
+        /// </summary>
+        /// <param name="fromNode">first node</param>
+        /// <param name="toNode">second node</param>
+        /// <returns>Nothing</returns>
+        public static void Swap(ref Node fromNode, ref Node toNode)
         {
-            string? word = nodeFrom.anagram;
-            int len = nodeFrom.length;
+            string? word = fromNode.anagram;
+            int len = fromNode.length;
 
-            nodeFrom.anagram = nodeTo.anagram;
-            nodeFrom.length = nodeTo.length;
-            nodeTo.anagram = word;
-            nodeTo.length = len;
+            fromNode.anagram = toNode.anagram;
+            fromNode.length = toNode.length;
+            toNode.anagram = word;
+            toNode.length = len;
         }
 
-        // method to sort the list first alphabetically then by increasing word length
-        public static void Sort(ref Node nodeHead)
+        /// <summary>
+        /// sort the anagrams list first alphabetically then by increasing word length
+        /// </summary>
+        /// <param name="headNode">the node head</param>
+        /// <returns>Nothing</returns>
+        public static void Sort(ref Node headNode)
         {
             Node? left, right;
             bool completed = false;
 
             while (!completed)
             {
-                left = nodeHead;
+                left = headNode;
                 right = left.next;
                 completed = true;
-                do
+                while ((left != null) && (right != null))
                 {
-                    if (String.Compare(left.anagram, right.anagram) >0)
+                    if (String.Compare(left.anagram, right.anagram) > 0)
                     {
                         Swap(ref left, ref right);
                         completed = false;
                     }
                     left = left.next;
                     right = right.next;
-                } while ((left != null) && (right != null));
+                }
             }
 
             completed = false;
             while (!completed)
             {
-                left = nodeHead;
+                left = headNode;
                 right = left.next;
                 completed = true;
-                do
+                while ((left != null) && (right != null))
                 {
                     if (left.length > right.length)
                     {
@@ -77,38 +80,40 @@ namespace ag
                     }
                     left = left.next;
                     right = right.next;
-                } while ((left != null) && (right != null));             
+                }
             }
         }
 
         // method to reset the answers
-        public void DestroyAnswers(Node? nodeHead)
+        /// <summary>
+        /// Resets the linkedlist of the anagrams from the root word
+        /// unlike with C, the garbage collector of C# will take care of reclaiming the meory
+        /// </summary>
+        /// <param name="headNode">the head node</param>
+        /// <returns>Nothing</returns>
+        public static void DestroyAnswers(Node? headNode)
         {
-            Node? current = nodeHead;
-            Node? previous;// = nodeHead;
-
-            while (current != null)
-            {
-                current.anagram = null;
-                previous = current;
-                current = current.next;
-                previous = null;
-            }
-            nodeHead = null;
+            headNode = null;
         }
 
-        // method to add a new word as long as it is not a duplicate
-        // from linked.c
-        public static Node Push(Node headRef, string anagram)
+
+        /// <summary> 
+        /// add a new word at the front of the linkedlist of anagrams 
+        /// as long as it is not a duplicate 
+        /// </summary>
+        /// <param name="headNode"></param>
+        /// <param name="new_anagram">The word to add to the list</param>
+        /// <returns>Nothing as the linkedlist itself is modified</returns>
+        public static void Push(Node headNode, string new_anagram)
         {
-            Node? current = new Node();
-            current = headRef;
-            int len;
+            Node? current = headNode;
+            // int len;
             bool duplicate = false;
 
+            // check if the word is already in the list
             while (current != null)
             {
-                if (string.Equals(anagram, current.anagram))
+                if (string.Equals(new_anagram, current.anagram))
                 {
                     duplicate = true;
                     break;
@@ -118,17 +123,18 @@ namespace ag
 
             if (!duplicate)
             {
-                Node newNode = new Node();
-                len = anagram.Length;
-                newNode.anagram = anagram;
-                newNode.length = len;
-                newNode.found = false;
-                newNode.guessed = false;
-                newNode.next = headRef;
+                Node newNode = new()
+                {
+                    anagram = new_anagram,
+                    length = new_anagram.Length,
+                    found = false,
+                    guessed = false,
+                    next = headNode
+                };
 
-                headRef = newNode;
+                headNode = newNode;
             }
-            return headRef;
+            // return headNode;
         }
     }
 }
