@@ -1,15 +1,12 @@
 // Replicating the ag.h file
-// Curiously, pre-processor defines were used to define constants - Here is not going to be done like that as I can't work out why it was done so there.
-
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
+// Preprocessors defines are replaced with const
+// Variable strings are set with get/set for more security controls
 
 namespace ag
 {
 
-
     /// <summary> Represents the main program class containing constants and structures.</summary>
-    public partial class Program
+    partial class Program
     {
         // public static IntPtr backgroundTex;
 
