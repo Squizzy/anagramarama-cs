@@ -65,7 +65,7 @@ namespace ag
         /// <summary> Delegate for operations on a Dlb_node. </summary>
         /// <param name="node">The Dlb_node to operate on.</param>
         /// <returns>An integer result of the operation.</returns>
-        public delegate int DlbNodeOperation(Dlb_node node);
+        public delegate int Dlb_node_operation(Dlb_node node);
 
     }
 }
