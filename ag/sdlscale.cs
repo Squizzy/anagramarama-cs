@@ -24,7 +24,7 @@ namespace ag
         /// <param name="srcRect">The original size, if any</param>
         /// <param name="dstRect">The scaled rectangle</param>
         /// <returns>Nothing</returns>
-        public static void SDLScale_RenderCopy(IntPtr renderer, IntPtr texture, ref SDL.SDL_Rect srcRect, ref SDL.SDL_Rect dstRect)
+        public static void SDLScale_RenderCopy(IntPtr renderer, IntPtr texture, SDL.SDL_Rect? srcRect, ref SDL.SDL_Rect dstRect)
         {
             SDL.SDL_Rect dstReal;
             // if (dstRect != null)
