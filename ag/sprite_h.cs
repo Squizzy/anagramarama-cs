@@ -31,9 +31,9 @@ namespace ag
             /// <value> Property <c>t</c> texture of the sprite </value>
             /// <remarks>(SDL_Texture *t) For some reason SDL2.SDL.SDL_Texture has not been defined in for c#, so using IntPtr</remarks>
             public IntPtr texture;
-            /// <value>Property <c>w</c> dimensions of the image</value>
+            /// <value>SDL_rect dimentions of the sprite</value>
             public SDL.SDL_Rect sprite_dimensions;
-            /// <value>Property <c>x, y</c> letter offset from the top left position of the band image</value>
+            /// <value>Sprite graphic offset from the top left position of the band image</value>
             public int x_offset, y_offset;
         }
 
@@ -51,7 +51,7 @@ namespace ag
         /// </summary>
         public class Sprite
         {
-            /// <value> Property <c>spr</c> The graphical representation </value>
+            /// <value> Property <c>spr</c>The graphical representation</value>
             public required Element[] spr;
             /// <value> Property <c>numSpr</c> **??** </value>
             public int numSpr;
