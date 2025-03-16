@@ -69,17 +69,17 @@ namespace ag
             public int box;
             
 
-            // public Sprite (int numOfElements)
-            // {
-            //     Element[] spr = new Element(numOfElements);
-            //     spr[0] = null;
-            //     numSpr = 0;
-            //     x = y = w = h = 0;
-            //     toX = toY = 0;
-            //     next = null;
-            //     index = 0;
-            //     box = 0;
-            // }
+            public Sprite (int numOfElements)
+            {
+                Element[] spr = new Element[numOfElements];
+                // spr[0] = null;
+                numSpr = 0;
+                x = y = w = h = 0;
+                toX = toY = 0;
+                next = null;
+                index = 0;
+                box = 0;
+            }
         }
 
     }
