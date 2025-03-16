@@ -1,5 +1,6 @@
 #define DEBUG
 
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using SDL2;
 
@@ -151,6 +152,7 @@ namespace ag
         public static uint audio_len;
         /// <summary>audio_pos</summary>
         public static IntPtr audio_pos;
+
         /// <summary> defines the Sound class </summary>
         /// <remarks> Constructor</remarks>
         /// <param name="name">Name of the sound</param>
@@ -167,10 +169,11 @@ namespace ag
         /// <summary>soundCache</summary>
         public static Sound? soundCache = new(null, IntPtr.Zero);
 
+
         // SKIPPED the Error and Debug functions of the original C as this is handled differently in C#
 
-        /// <summary>
-        /// Search through the list of sound names and return the corresponding audio chunk
+
+        /// <summary> Search through the list of sound names and return the corresponding audio chunk
         /// walk the module level soundCache until the requiredname is found.  
         /// when found, return the audio data
         /// if name is not found, return NULL instead.
@@ -191,6 +194,7 @@ namespace ag
             }
             return IntPtr.Zero;
         }
+
 
         /// <summary> push a sound onto the soundCache </summary>
         /// <param name="soundCache">pointer to the head of the soundCache</param>
@@ -218,8 +222,8 @@ namespace ag
             soundCache = thisSound;
         }
 
-        /// <summary>
-        /// push all the game sounds onto the soundCache linked list.  
+
+        /// <summary> push all the game sounds onto the soundCache linked list.  
         /// Note that soundCache is passed into pushSound by reference, 
         /// so that the head pointer can be updated
         /// </summary>
@@ -239,8 +243,7 @@ namespace ag
         }
 
 
-        /// <summary>
-        /// Free the memory of the sound chunks
+        /// <summary> Free the memory of the sound chunks
         /// No longer needed in c# but kept for the sake of keeting
         /// </summary>
         /// <returns>Nothing</returns>
@@ -287,9 +290,8 @@ namespace ag
             SDL.SDL_DestroyTexture(image);
         }
 
-        /// <summary>
-        /// Display the answer boxes (small boxes at the bottom I think)
-        /// </summary>
+
+        /// <summary> Display the answer boxes (small boxes at the bottom I think) </summary>
         /// <param name="headNode">The head node of anagrams (with the info on if they have been found or guessed)</param>
         /// <param name="screen">The renderer</param>
         /// <returns>Nothing</returns>
@@ -396,8 +398,7 @@ namespace ag
         }
 
 
-        /// <summary>
-        /// Declare all all the anagrams as found (but not necessarily guessed)
+        /// <summary> Declare all all the anagrams as found (but not necessarily guessed)
         /// </summary>
         /// <param name="headNode">The head node of the anagrams list</param>
         /// <returns>Nothing</returns>
@@ -504,8 +505,7 @@ namespace ag
         }
 
 
-        /// <summary>
-        /// determine the next blank space in a string 
+        /// <summary> determine the next blank space in a string 
         /// blanks are indicated by pound not space.
         /// When a blank is found, move the chosen letter from one box to the other.
         /// i.e. If we're using the ANSWER box, 
@@ -557,9 +557,9 @@ namespace ag
             return i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X;
         }
 
-        /// <summary>
-        /// handle the keyboard events:
-        ///  - BACKSPACE & ESCAPE - clear letters
+
+        /// <summary> handle the keyboard events:
+        ///  - BACKSPACE and ESCAPE - clear letters
         ///  - RETURN - check guess
         ///  - SPACE - shuffle
         /// - a-z - select the first instance of that letter in the shuffle box and move to the answer box
@@ -667,6 +667,31 @@ namespace ag
         }
 
 
+        /// <summary> checks where the mouse click occurred
+        ///  - if it's in a defined hotspot then perform the appropriate action
+	    /// Hotspot	        Action
+	    /// -----------------------------------------------------
+	    /// A letter		set the new x,y of the letter and play the appropriate sound
+        /// 
+	    /// ClearGuess		set the clearGuess flag
+        /// 
+	    /// checkGuess		pass the current answer to the checkGuess routine
+        /// 
+	    /// solvePuzzle		set the solvePuzzle flag
+        /// 
+	    /// shuffle		    set the shuffle flag and play the appropriate sound
+        /// 
+	    /// newGame		    set the newGame flag
+        /// 
+	    /// quitGame		set the quitGame flag
+        /// </summary>
+        /// <param name="button">mouse button that has been clicked</param>
+        /// <param name="x">the x coords of the mouse</param>
+        /// <param name="y">the y coords of the mouse</param>
+        /// <param name="screen">the SDL_Surface to display the image</param>
+        /// <param name="headNode">pointer to the top of the answers list</param>
+        /// <param name="letters">pointer to the letters sprites</param>
+        /// <returns>Nothing</returns>
         public static void ClickDetect(int button, int x, int y, IntPtr screen, Node headNode, Sprite letters)
         {
             Sprite current = letters;
@@ -711,7 +736,7 @@ namespace ag
                 if (IsInside(hotbox[(int)HotBoxes.boxEnter], x, y))
                 {
                     //enter has been pressed
-                    CheckGuess(new string (Answer), headNode);
+                    CheckGuess(new string(Answer), headNode);
                 }
 
                 if (IsInside(hotbox[(int)HotBoxes.boxSolve], x, y))
@@ -741,6 +766,91 @@ namespace ag
             }
         }
 
+
+        // TODO: Clarify what the return is
+        /// <summary> move all letters from answer to shuffle </summary>
+        /// <param name="letters">the letter sprites</param>
+        /// <returns>the count of???</returns>
+        public static int ClearWord(Sprite letters)
+        {
+            Sprite? current = letters;
+            Sprite[] orderedLetters = new Sprite[7];
+            int count = 0;
+
+            // There is a constructor so not needed
+            // for (int i = 0; i < orderedLetters.Length / orderedLetters[0].Length; i++)
+            // {
+            //     orderedLetters[i] = null;
+            // }
+
+            while (current != null)
+            {
+                if (current.box == ANSWER)
+                {
+                    count++;
+                    orderedLetters[current.index] = current;
+                    current.toX = SHUFFLE_BOX_Y;
+                    current.box = SHUFFLE;
+                }
+                current = current.next;
+            }
+
+            for (int i = 0; i < 7; i++)
+            {
+                if (orderedLetters[i] != null)
+                {
+                    orderedLetters[i].toX = NextBlankPosition(SHUFFLE, orderedLetters[i].index);
+                }
+            }
+
+            return count;
+        }
+
+
+        /// <summary> display the score graphic </summary>
+        /// <param name="screen">the SDL_Surface to display the image</param>
+        /// <returns>Nothing</returns>
+        private static void UpdateScore(IntPtr screen)
+        {
+            SDL.SDL_Rect fromRect, toRect, blankRect;
+
+            blankRect.x = SCORE_WIDTH * 11;
+            blankRect.y = 0;
+            blankRect.w = SCORE_WIDTH;
+            blankRect.h = SCORE_HEIGHT;
+
+            fromRect.x = 0;
+            fromRect.y = 0;
+            fromRect.w = SCORE_WIDTH;
+            fromRect.h = SCORE_HEIGHT;
+
+            toRect.y = 0;
+            toRect.w = SCORE_WIDTH;
+            toRect.h = SCORE_HEIGHT;
+
+            string buffer = totalScore.ToString();
+
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                fromRect.x = SCORE_WIDTH * ((int)buffer[i] - 48);
+                toRect.x = SCORE_WIDTH * i;
+                scoreSprite.spr[i].sprite_dimensions = fromRect;
+                scoreSprite.spr[i].x_offset = toRect.x;
+            }
+        }
+
+
+        public static void Updatetime(IntPtr screen)
+        {
+            SDL.SDL_Rect fromRect;
+            fromRect.x = 0;
+            fromRect.y = 0;
+            fromRect.w = CLOCK_WIDTH;
+            fromRect.h = CLOCK_HEIGHT;
+
+            int thisTime = (DateTime)AVAILABLE_TIME - gameTime;
+
+        }
 
         // STOPPED HERE ###########################
 
