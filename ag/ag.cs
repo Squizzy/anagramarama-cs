@@ -90,8 +90,8 @@ namespace ag
 
         /// <summary>gameStart</summary>
         public static DateTime gameStart;
-        /// <summary>gameTime</summary>
-        public static DateTime gameTime;
+        /// <value>The number of seconds elapsed since the begining of the game</value>
+        public static int gameTime;
         /// <summary>stopTheclock</summary>
         public static bool stopTheClock = false;
 
@@ -140,9 +140,9 @@ namespace ag
         public static IntPtr answerBoxUnknown = IntPtr.Zero;
         /// <summary>answerBoxKnown</summary>
         public static IntPtr answerBoxKnown = IntPtr.Zero;
-        /// <summary>clockSprite</summary>
+        /// <value>The list of sprites representing the time</value>
         public static Sprite? clockSprite = null;
-        /// <summary>scoreSprite</summary>
+        /// <summary>The list of sprites representing the score</summary>
         public static Sprite? scoreSprite = null;
 
         // audio vars
@@ -770,7 +770,7 @@ namespace ag
         // TODO: Clarify what the return is
         /// <summary> move all letters from answer to shuffle </summary>
         /// <param name="letters">the letter sprites</param>
-        /// <returns>the count of???</returns>
+        /// <returns>the count of??? letters cleared, used to play a sound if not null??</returns>
         public static int ClearWord(Sprite letters)
         {
             Sprite? current = letters;
@@ -807,7 +807,7 @@ namespace ag
         }
 
 
-        /// <summary> display the score graphic </summary>
+        /// <summary>Displays the score graphically</summary>
         /// <param name="screen">the SDL_Surface to display the image</param>
         /// <returns>Nothing</returns>
         private static void UpdateScore(IntPtr screen)
@@ -840,7 +840,10 @@ namespace ag
         }
 
 
-        public static void Updatetime(IntPtr screen)
+        /// <summary>Displays the time graphically</summary>
+        /// <param name="screen">the SDL_Surface on which to display the image</param>
+        /// <returns>Nothing</returns>
+        public static void UpdateTime(IntPtr screen)
         {
             SDL.SDL_Rect fromRect;
             fromRect.x = 0;
@@ -848,9 +851,141 @@ namespace ag
             fromRect.w = CLOCK_WIDTH;
             fromRect.h = CLOCK_HEIGHT;
 
-            int thisTime = (DateTime)AVAILABLE_TIME - gameTime;
+            int thisTime = AVAILABLE_TIME - gameTime;
+            TimeSpan timeSpan = TimeSpan.FromSeconds(thisTime);
+
+            int minutes = timeSpan.Minutes;
+            int minutesTens = minutes / 10;
+            int minutesUnits = minutes % 10;
+            int seconds = timeSpan.Seconds;
+            int secondsTens = seconds / 10;
+            int secondsUnits = seconds % 10;
+
+            fromRect.x = CLOCK_WIDTH * minutesTens;
+            clockSprite.spr[0].sprite_dimensions = fromRect;
+            fromRect.x = CLOCK_WIDTH * minutesUnits;
+            clockSprite.spr[1].sprite_dimensions = fromRect;
+            fromRect.x = CLOCK_WIDTH * secondsTens;
+            clockSprite.spr[3].sprite_dimensions = fromRect;
+            fromRect.x = CLOCK_WIDTH * secondsUnits;
+            clockSprite.spr[4].sprite_dimensions = fromRect;
+        }
+
+
+        /// <summary> Shuffles the characters in a given word array. </summary>
+        /// <param name="word">The word array to be shuffled.</param>
+        /// <remarks>
+        /// This method generates a random number between 20 and 26, and then swaps two characters in the word array
+        /// for the generated number of times. The characters to be swapped are randomly selected using the Random class.
+        /// </remarks>
+        /// <returns>Nothing, the word is passed by reference</returns>
+        public static void ShuffleWord(ref char[] word)
+        {
+            int a, b;
+            char tmp;
+            Random random = new();
+
+            // generate a random number between 20 and 26. The rand() function in C no longer exists in C#
+            // This was done in the initial c app, not sure why. Probably to increase the randomness result?
+            int count = random.Next(20, 27);
+
+            for (int n = 0; n < count; n++)
+            {
+                a = random.Next(0, 7);
+                b = random.Next(0, 7);
+                tmp = word[a];
+                word[a] = word[b];
+                word[b] = tmp;
+            }
+
+            // char tmp;
+            
+            // Random randCount = new Random();
+            // int count = randCount.Next(20, 27);
+
+            // // generate two random values, using the same random generator to prevent possible repeated values.
+            // Random randPos = new Random();
+            // int a = randPos.Next(0, 7);
+            // int b = randPos.Next(0, 7);
+
+            // for (int n=0; n < count; ++n )
+            // {
+            //     a = randPos.Next(0, 7);
+            //     b = randPos.Next(0, 7);
+            //     tmp = word[a];
+            //     word[a] = word[b];
+            //     word[b] = tmp;
+            // }
 
         }
+
+
+        /// <summary>Returns the index of first occurrence of a specific letter in a string.</summary>
+        /// <param name="word">The word to check</param>
+        /// <param name="letter">The char to find in the word</param>
+        /// <returns>The position of the letter if it is found or -1 if not</returns>
+        public static int WhereInString(string word, char letter)
+        {
+            int pos = word.IndexOf(letter);
+            return pos != -1 ? pos : 0;
+        }
+
+
+        /// <summary> shuffle word, but also the Sprite letter </summary>
+        /// <param name="word">The word to shuffle</param>
+        /// <param name="letters">The sprite letters to shuffle at the same time</param>
+        /// <returns>Nothing as passed by reference</returns>
+        public static void ShuffleAvailableLetters(ref string word, ref Sprite letters)
+        {
+            Sprite thisLetter = letters;
+            int from, to;
+            char swap, posSwap;
+            char[] shuffleChars = new char[8];
+            char[] shufflePos = new char[8];
+            int i = 0;
+            int numSwaps;
+
+            Random random = new();
+
+
+            for (i = 0; i < 7; i++)
+            {
+                shufflePos[i] = (char)(i + 1);
+            }
+            shufflePos[7] = '\0';
+
+            shuffleChars = word.ToCharArray();
+
+            numSwaps = random.Next(20, 30);
+
+            for (i = 0; i < numSwaps; i++)
+            {
+                from = random.Next(0, 7);
+                to = random.Next(0, 7);
+
+                swap = shuffleChars[from];
+                shuffleChars[from] = shuffleChars[to];
+                shufflePos[to] = swap;
+
+                posSwap = shufflePos[from];
+                shufflePos[from] = shufflePos[to];
+                shufflePos[to] = posSwap;
+            }
+
+            while (thisLetter != null)
+            {
+                if (thisLetter.box == SHUFFLE)
+                {
+                    thisLetter.toX = (WhereInString(new string(shufflePos), (char)(thisLetter.index + 1)) * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE)) + BOX_START_X;
+                    thisLetter.toY = (WhereInString(new string(shufflePos), (char)(thisLetter.index + 1)));
+                }
+                thisLetter = thisLetter.next;
+            }
+
+            word = new string(shuffleChars);
+        }
+
+
 
         // STOPPED HERE ###########################
 
@@ -940,38 +1075,7 @@ namespace ag
         }
 
 
-        /// <summary>
-        /// Shuffles the characters in a given word array.
-        /// </summary>
-        /// <param name="word">The word array to be shuffled.</param>
-        /// <remarks>
-        /// This method generates a random number between 20 and 26, and then swaps two characters in the word array
-        /// for the generated number of times. The characters to be swapped are randomly selected using the Random class.
-        /// </remarks>
 
-        public static void ShuffleWord(char[] word)
-        {
-            char tmp;
-            
-            // generate a random number between 20 and 26. The rand() function in C no longer exists in C#
-            Random randCount = new Random();
-            int count = randCount.Next(20, 27);
-
-            // generate two random values, using the same random generator to prevent possible repeated values.
-            Random randPos = new Random();
-            int a = randPos.Next(0, 7);
-            int b = randPos.Next(0, 7);
-
-            for (int n=0; n < count; ++n )
-            {
-                a = randPos.Next(0, 7);
-                b = randPos.Next(0, 7);
-                tmp = word[a];
-                word[a] = word[b];
-                word[b] = tmp;
-            }
-
-        }
 
 
         public static void BuildLetters(ref Sprite letters, IntPtr screen)
