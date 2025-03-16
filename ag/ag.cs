@@ -940,15 +940,16 @@ namespace ag
             Sprite thisLetter = letters;
             int from, to;
             char swap, posSwap;
-            char[] shuffleChars = new char[8];
+            // char[] shuffleChars = new char[8];
+            char[] shuffleChars;
+
             char[] shufflePos = new char[8];
-            int i = 0;
             int numSwaps;
 
             Random random = new();
 
 
-            for (i = 0; i < 7; i++)
+            for (int i = 0; i < 7; i++)
             {
                 shufflePos[i] = (char)(i + 1);
             }
@@ -958,7 +959,7 @@ namespace ag
 
             numSwaps = random.Next(20, 30);
 
-            for (i = 0; i < numSwaps; i++)
+            for (int i = 0; i < numSwaps; i++)
             {
                 from = random.Next(0, 7);
                 to = random.Next(0, 7);
@@ -977,14 +978,78 @@ namespace ag
                 if (thisLetter.box == SHUFFLE)
                 {
                     thisLetter.toX = (WhereInString(new string(shufflePos), (char)(thisLetter.index + 1)) * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE)) + BOX_START_X;
-                    thisLetter.toY = (WhereInString(new string(shufflePos), (char)(thisLetter.index + 1)));
+                    thisLetter.toY = WhereInString(new string(shufflePos), (char)(thisLetter.index + 1));
                 }
                 thisLetter = thisLetter.next;
             }
-
             word = new string(shuffleChars);
         }
 
+
+        /// <summary>Build letter string into linked list of letter graphics </summary>
+        /// <param name="letters">letter sprites head node (in/out)</param>
+        /// <param name="screen">SDL_Surface to display the image</param>
+        /// <returns>Nothing</returns>
+        // TODO: Check if the arguments should be passed by reference
+        public static void BuildLetters(Sprite letters, IntPtr screen)
+        {
+            Sprite thisLetter = null, previousLetter = null;
+
+            SDL.SDL_Rect rect;
+            int index = 0;
+
+            Random random = new();
+
+            rect.y = 0;
+            rect.w = GAME_LETTER_WIDTH;
+            rect.h = GAME_LETTER_HEIGHT;
+
+            int len = Shuffle.Length;
+
+            for (int i = 0; i < len; i++)
+            {
+                thisLetter.numSpr = 0;
+
+                if (Shuffle[i] != ASCII_SPACE && Shuffle[i] != SPACE_CHAR)
+                {
+                    int chr = (int)(Shuffle[i] - 'a');
+                    rect.x = chr * GAME_LETTER_WIDTH;
+                    thisLetter.numSpr = 1;
+
+                    // TODO: check where letterBank is defined twice
+
+                    thisLetter.spr[0].texture = letterBank;
+                    thisLetter.spr[0].sprite_dimensions = rect;
+                    thisLetter.spr[0].x_offset = 0;
+                    thisLetter.spr[0].y_offset = 0;
+                    // TODO: Continue here#######################
+
+
+                    thisLetter.x = random.Next(800);/*i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X;*/
+                    thisLetter.y = random.Next(600); /* SHUFFLE_BOX_Y; */
+                    thisLetter.letter = Shuffle[i];
+                    thisLetter.h = GAME_LETTER_HEIGHT;
+                    thisLetter.w = GAME_LETTER_WIDTH;
+                    thisLetter.toX = i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X;
+                    thisLetter.toY = SHUFFLE_BOX_Y;
+                    thisLetter.next = previousLetter;
+                    thisLetter.box = SHUFFLE;
+                    thisLetter.index = index++;
+
+                    previousLetter = thisLetter;
+
+                    letters = thisLetter;
+
+                    thisLetter = null;
+                }
+                else
+                {
+                    Shuffle[i] = SPACE_CHAR;
+                    // rect.x = 26 * GAME_LETTER_WIDTH;
+                }
+
+            }
+        }   
 
 
         // STOPPED HERE ###########################
