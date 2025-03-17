@@ -10,33 +10,33 @@ namespace ag
     {
         // public static IntPtr backgroundTex;
 
-        /// <summary> ASCII OFFSET to convert a number to it's character equivalent </summary>
+        /// <value> ASCII OFFSET to convert a number to its character equivalent </value>
         public const int NUM_TO_CHAR = 48;
 
         /// <summary>  Represents a rectangular box with position and size. </summary>
         public struct Box
         {
-            /// <summary>The x-coordinate of the box.</summary>
+            /// <value>x-coordinate of the top left of the box.</value>
             public int x;
 
-            /// <summary>The y-coordinate of the box.</summary>
+            /// <value>y-coordinate of the top left of the box.</value>
             public int y;
 
-            /// <summary>The width of the box.</summary>
+            /// <value>width of the box.</value>
             public int width;
 
-            /// <summary>The height of the box.</summary>
+            /// <value>height of the box.</value>
             public int height;
         }
 
         /// <summary> Pixel details of boxes </summary>
-        /// <summary> Shuffle Box Y location </summary>
+        /// <value> Shuffle Box Y position </value>
         public const int SHUFFLEBOX = 110;
-        /// <summary> Answer Box Y location </summary>
+        /// <value> Answer Box Y position </value>
         public const int ANSWERBOX = 245;
-        /// <summary> Box X location </summary>
+        /// <value> Shuffle and Answer Boxes X position </value>
         public const int BOX_START = 30;
-        /// <summary> Box length </summary>
+        /// <value> Shuffle and Answer Boxes length </value>
         public const int BOX_LENGTH = 644;
 
         /// <summary> Pixel dimensions of letters </summary>
@@ -52,46 +52,46 @@ namespace ag
         public const int ANSWER = 1;
         /// <summary> Shuffle box identifier </summary>
         public const int SHUFFLE = 2;
-        /// <summary> Controls box identifier </summary>
+        /// <summary> Controls box identifier (Score + Time...)</summary>
         public const int CONTROLS = 3;
 
         /// <summary> define the clock position and character width </summary>
-        /// <summary> clock X pixel position </summary>
+        /// <value> ClockBox X pixel position </value>
         public const int CLOCK_X = 690;
-        /// <summary> clock Y pixel position </summary>
+        /// <value> ClockBox Y pixel position </value>
         public const int CLOCK_Y = 35;
-        /// <summary> clock pixel width </summary>
+        /// <value> ClockCharacter pixel width </value>
         public const int CLOCK_WIDTH = 18;
-        /// <summary> clock pixel height </summary>
+        /// <value> ClockCharacter pixel height </value>
         public const int CLOCK_HEIGHT = 32;
 
         /// <summary> define the clock position and character width </summary>
-        /// <summary> Score X pixel position </summary>
+        /// <value> ScoreBox X pixel position </value>
         public const int SCORE_X = 690;
-        /// <summary> Score Y pixel position </summary>
+        /// <value> ScoreBox Y pixel position </value>
         public const int SCORE_Y = 67;
-        /// <summary> Score pixel width </summary>
+        /// <value> ScoreCharacter pixel width </value>
         public const int SCORE_WIDTH = 18;
-        /// <summary> Score pixel height </summary>
+        /// <value> ScoreCharacter pixel height </value>
         public const int SCORE_HEIGHT = 32;
 
 
-        /// <summary>Represents the space character used in the program.</summary>
+        /// <value>Represents the space character used in the program.</value>
         public const char SPACE_CHAR = '#';
 
-        /// <summary>Represents the ASCII value for the space character.</summary>
+        /// <value>Represents the ASCII value for the space character.</value>
         public const int ASCII_SPACE = 32;
 
-        /// <summary>Represents a string filled with space characters.</summary> 
+        /// <value>Represents a string filled with space characters.</value> 
         public const string SPACE_FILLED_CHARS = "#######";
 
-        /// <summary> Represents an array of space characters. </summary>
+        /// <value> Represents an array of space characters. </value>
         public static readonly string SPACE_FILLED_STRING = new(SPACE_CHAR, 7);
 
-        /// <summary> Sets the time of the game (5 mins default = 300s). </summary>
+        /// <value> Sets the time of the game (5 mins default = 300s). </value>
         public const int AVAILABLE_TIME = 300;
 
-        /// <summary> Path to the locale dictionary </summary>
+        /// <value> Path to the locale dictionary </value>
         public const string DEFAULT_LOCALE_PATH = "i18n/en_GB";
 
     }
