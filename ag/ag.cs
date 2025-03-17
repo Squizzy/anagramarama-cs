@@ -1,4 +1,7 @@
+using System.Diagnostics.Tracing;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Microsoft.VisualBasic;
 using SDL2;
 
 
@@ -1291,94 +1294,303 @@ namespace ag
             gameStart = DateTime.Now;
             gameTime = 0;
             stopTheClock = false;
+            // }
+
+
+            //             // buffer = GetRandomWord(wordsListPath).ToCharArray();
+            //             //guess = "".ToCharArray();
+            //             // rootWord = buffer;
+            //             // bigWordLen = rootWord.Length - 1;
+
+            //             for (int i = 0; i < rootWord.Length; i++) remain[i] = rootWord[i];
+            //                 //remain =rootWord;
+
+
+            //                 // Not needed in C# as garbage collection is handled already
+            //                 //destroyAnswers(answers);
+
+            //                 answerSought = Length(answers);
+            //                 string newGuessString = new string(guess).Trim('\0');
+            //                 string newRemainString = new string(remain).Trim('\0');
+            //                 Ag(ref answers, dict, newGuessString, newRemainString);
+            //                 guess = newGuessString.ToCharArray();
+            //                 char[] rem = newRemainString.ToCharArray();
+            //                 for (int i = 0; i < newRemainString.Length; i++) remain[i] = rem[i];
+            //                 //remain = newRemainString.ToCharArray();
+
+            //                 answerSought = Length(answers);
+
+            //                 // happy if the number of anagrams are 6 or more, and less than 77
+            //                 happy = ((answerSought < 77) && (answerSought >= 6));
+
+            // #if DEBUG
+            //                 if (!happy) Console.WriteLine($"Too Many Answers!  word: {new string(rootWord)}, answers: {answerSought}");
+            // #endif
+            //             }
+            //             Console.WriteLine("Happy found");
+            // #if DEBUG
+            //             if (happy) Console.WriteLine($"Selected word: {new string(rootWord)}, answers: {answerSought}");
+            // #endif
+
+            //             Sort(ref answers);
+
+            //             for (int i = bigWordLen; i < 7; i++)
+            //             {
+            //                 remain[i] = SPACE_CHAR;
+            //             }
+            //             remain[7] = '\0';
+            //             remain[bigWordLen] = '\0';
+
+            //             ShuffleWord(remain);
+            //             shuffle = remain;
+            //             answer = SPACE_FILLED_STRING;
+
+            //             // HERE
+
         }
 
 
-        //             // buffer = GetRandomWord(wordsListPath).ToCharArray();
-        //             //guess = "".ToCharArray();
-        //             // rootWord = buffer;
-        //             // bigWordLen = rootWord.Length - 1;
 
-        //             for (int i = 0; i < rootWord.Length; i++) remain[i] = rootWord[i];
-        //                 //remain =rootWord;
+        /// <summary> Callback method for SDL timer events
+        /// Attempt at rewrite of the timer callback from the original C
+        /// </summary>
+        /// <param name="interval">The interval in milliseconds for the timer.</param>
+        /// <param name="param">Additional parameters for the callback (unused).</param>
+        /// <returns>The interval for the next timer event.</returns>        
 
+        public static uint TimerCallBack(uint interval, IntPtr param)
+        {
+            SDL.SDL_UserEvent userEvent = new SDL.SDL_UserEvent()
+            {
+                type = (uint)SDL.SDL_EventType.SDL_USEREVENT,
+                code = 0,
+                data1 = IntPtr.Zero,
+                data2 = IntPtr.Zero,
+            };
 
-        //                 // Not needed in C# as garbage collection is handled already
-        //                 //destroyAnswers(answers);
+            SDL.SDL_Event sdlEvent = new SDL.SDL_Event()
+            {
+                type = SDL.SDL_EventType.SDL_USEREVENT,
+                user = userEvent,
+            };
 
-        //                 answerSought = Length(answers);
-        //                 string newGuessString = new string(guess).Trim('\0');
-        //                 string newRemainString = new string(remain).Trim('\0');
-        //                 Ag(ref answers, dict, newGuessString, newRemainString);
-        //                 guess = newGuessString.ToCharArray();
-        //                 char[] rem = newRemainString.ToCharArray();
-        //                 for (int i = 0; i < newRemainString.Length; i++) remain[i] = rem[i];
-        //                 //remain = newRemainString.ToCharArray();
+            SDL.SDL_PushEvent(ref sdlEvent);
 
-        //                 answerSought = Length(answers);
-
-        //                 // happy if the number of anagrams are 6 or more, and less than 77
-        //                 happy = ((answerSought < 77) && (answerSought >= 6));
-
-        // #if DEBUG
-        //                 if (!happy) Console.WriteLine($"Too Many Answers!  word: {new string(rootWord)}, answers: {answerSought}");
-        // #endif
-        //             }
-        //             Console.WriteLine("Happy found");
-        // #if DEBUG
-        //             if (happy) Console.WriteLine($"Selected word: {new string(rootWord)}, answers: {answerSought}");
-        // #endif
-
-        //             Sort(ref answers);
-
-        //             for (int i = bigWordLen; i < 7; i++)
-        //             {
-        //                 remain[i] = SPACE_CHAR;
-        //             }
-        //             remain[7] = '\0';
-        //             remain[bigWordLen] = '\0';
-
-        //             ShuffleWord(remain);
-        //             shuffle = remain;
-        //             answer = SPACE_FILLED_STRING;
-
-        //             // HERE
-
-        // }
-
+            return interval;
+        }
 
 
         /// <summary>
-        /// Attempt at rewrite of the timer callback from the original C
+        /// a big while loop that runs the full length of the game, 
+        /// checks the game events and responds accordingly
+        ///
+        /// event		    action
+        /// -------------------------------------------------
+        /// winGame	        stop the clock and solve puzzle
+        /// timeRemaining   update the clock tick
+        /// timeUp	        stop the clock and solve puzzle
+        /// solvePuzzle	    trigger solve puzzle and stop clock
+        /// updateAnswers   trigger update answers
+        /// startNew        trigger start new
+        /// updateScore	    trigger update score
+        /// shuffle	        trigger shuffle
+        /// clear		    trigger clear answer
+        /// quit		    end loop
+        /// poll events     check for keyboard/mouse and quit
+        ///
+        /// finally, move the sprites - this is always called so the sprites 
+        /// are always considered to be moving no "move sprites" event exists 
+        /// - sprites x&y just needs to be updated and they will always be moved
         /// </summary>
-        // public static void TimerCallBack(Object source, ElapsedEventArgs e)
-        public static void TimerCallBack()
-        {
-            SDL.SDL_UserEvent userEvent = new SDL.SDL_UserEvent();
-            userEvent.type = (uint)SDL.SDL_EventType.SDL_USEREVENT;
-            userEvent.code = 0;
-            userEvent.data1 = IntPtr.Zero;
-            userEvent.data2 = IntPtr.Zero;
-
-            SDL.SDL_Event sdlEvent = new SDL.SDL_Event();
-            sdlEvent.type = SDL.SDL_EventType.SDL_USEREVENT;
-            sdlEvent.user = userEvent;
-
-            SDL.SDL_PushEvent(ref sdlEvent);
-        }
-
-
-        public static void GameLoop(Node headNode, Dlb_node dldHeadNode, IntPtr screen, Sprite letters)
+        /// <param name="headNode">first node in the answers list (in/out)</param>
+        /// <param name="dldHeadNode">first node in the dictionary list</param>
+        /// <param name="screen">SDL_Surface to display the image</param>
+        /// <param name="letters">first node in the letter sprites (in/out)</param>
+        /// <returns>Nothing</returns>
+        public static void GameLoop(ref Node headNode, Dlb_node dldHeadNode, IntPtr screen, ref Sprite letters)
         {
             bool done = false;
             SDL.SDL_Event sdlEvent;
-            DateTime timeNow;
-            SDL.SDL_INIT_TIMER.SDL_timerID timer;
+            int timeNow;
+            // TimeSpan timeNow;
 
+            SDL.SDL_Init(SDL.SDL_INIT_TIMER);
+            uint timer_delay = 20;
+            int timer = SDL.SDL_AddTimer(timer_delay, TimerCallBack, IntPtr.Zero);
+
+            SDL.SDL_Rect dest;
+            dest.x = 0;
+            dest.y = 0;
+            dest.w = 800;
+            dest.h = 600;
+
+            while (!done)
+            {
+                SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
+                SDL.SDL_RenderClear(screen);
+                SDLScale_RenderCopy(screen, backgroundTex, null, ref dest);
+
+                if (winGame)
+                {
+                    stopTheClock = true;
+                    solvePuzzle = true;
+                }
+
+                if ((gameTime < AVAILABLE_TIME) && !stopTheClock)
+                {
+                    timeNow = (DateTime.Now - gameStart).Seconds;
+                    if (timeNow != gameTime)
+                    {
+                        gameTime = timeNow;
+                        UpdateTime(screen);
+                    }
+                    else
+                    {
+                        if (!stopTheClock)
+                        {
+                            stopTheClock = true;
+                            solvePuzzle = true;
+                        }
+                    }
+
+                    // Check messages
+                    if (solvePuzzle)
+                    {
+                        // Walk the list, setting everything to found
+                        SolveIt(headNode);
+                        ClearWord(letters);
+                        Shuffle = SPACE_FILLED_STRING.ToCharArray();
+                        Answer = rootword;
+                        gamePaused = true;
+                        if (!stopTheClock)
+                        {
+                            stopTheClock = true;
+                        }
+                        solvePuzzle = false;
+                    }
+
+                    if (updateAnswers)
+                    {
+                        // move letters back down again
+                        ClearWord(letters);
+                        updateAnswers = false;
+                    }
+                    DisplayAnswerBoxes(headNode, screen);
+
+                    if (startNewGame)
+                    {
+                        // move letters back down again
+                        if (!gotBigWord)
+                        {
+                            totalScore = 0;
+                        }
+                        NewGame(ref headNode, dldHeadNode, screen, ref letters);
+
+                        startNewGame = false;
+                    }
+
+                    if (shuffleRemaining)
+                    {
+                        // shuffle up the shuffle box
+                        string shuffler;
+                        shuffler = new string(Shuffle);
+                        ShuffleAvailableLetters(ref shuffler, ref letters);
+                        Shuffle = shuffler.ToCharArray();
+                        shuffleRemaining = false;
+                    }
+
+                    if (clearGuess)
+                    {
+                        // clear the guess
+                        if (ClearWord(letters) > 0)
+                        {
+                            if (audio_enabled)
+                            {
+                                SDL_mixer.Mix_PlayChannel(-1, GetSound("clear"), 0);
+                            }
+                            clearGuess = false;
+                        }
+                    }
+
+                    if (quitGame)
+                    {
+                        done = true;
+                    }
+
+                    while (SDL.SDL_WaitEvent(out sdlEvent) != 0)  // need to use int as return is not a bool
+                    {
+                        if (sdlEvent.type == SDL.SDL_EventType.SDL_USEREVENT)
+                        {
+                            timer_delay = (uint)(AnySpriteMoving(letters) ? 10 : 100);
+                            SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
+                            SDL.SDL_RenderClear(screen);
+                            SDLScale_RenderCopy(screen, backgroundTex, null, ref dest);
+                            DisplayAnswerBoxes(headNode, screen);
+                            MoveSprites(ref screen, letters, letterSpeed);
+                            timer = SDL.SDL_AddTimer(timer_delay, TimerCallBack, IntPtr.Zero);
+                            break;
+                        }
+
+                        else if (sdlEvent.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN)
+                        {
+                            SDLScale_MouseEvent(ref sdlEvent);
+                        }
+
+                        else if (sdlEvent.type == SDL.SDL_EventType.SDL_KEYUP)
+                        {
+                            HandleKeyboardEvent(sdlEvent, headNode, letters);
+                        }
+
+                        else if (sdlEvent.type == SDL.SDL_EventType.SDL_QUIT)
+                        {
+                            done = true;
+                            break;
+                        }
+
+                        else if (sdlEvent.type == SDL.SDL_EventType.SDL_WINDOWEVENT)
+                        {
+                            if ((sdlEvent.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED) ||
+                                    (sdlEvent.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_SIZE_CHANGED))
+                            {
+                                double scalew = sdlEvent.window.data1 / 800.0;
+                                double scaleh = sdlEvent.window.data2 / 600.0;
+                                SDLScale_Set(scalew, scaleh);
+                            }
+                        }
+                        SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
+                        SDL.SDL_RenderClear(screen);
+                        SDLScale_RenderCopy(screen, backgroundTex, null, ref dest);
+                        DisplayAnswerBoxes(headNode, screen);
+                        MoveSprites(ref screen, letters, letterSpeed);
+                    }
+                }
+            }
 
         }
 
 
+        /// <summary> Check that the dictionary in the local language exists </summary>
+        /// <param name="path">The path, including the locale, to the wordfile in the desired language</param>
+        /// <returns>true if the file exists otherwise false</returns>
+        public static bool IsValidLocale(string path)
+        {
+            string filePath = path;
+            if (filePath.ToCharArray()[filePath.Length] != '/')
+            {
+                filePath += '/';
+            }
+            filePath += "wordlist.txt";
+
+            return File.Exists(filePath);
+        }
+
+
+
+        public static bool ConfigBox(Box pbox, string line)
+        {
+            int x, y, w, h;
+            
+        }
 
     }
 }
