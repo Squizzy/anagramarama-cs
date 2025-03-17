@@ -1,8 +1,6 @@
-#define DEBUG
-
-using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using SDL2;
+
 
 
 namespace ag
@@ -10,17 +8,17 @@ namespace ag
 
     public partial class Program
     {
-        
+
         public enum HotBoxes { boxSolve, boxNew, boxQuit, boxShuffle, boxEnter, boxClear };
 
         public static Box[] hotbox = new Box[]
         {
-            new() { x = 612, y =   0, width = 66, height = 30 },  /* boxSolve */  
-            new() { x = 686, y =   0, width = 46, height = 30 },  /* boxNew */    
-            new() { x = 742, y =   0, width = 58, height = 30 },  /* boxQuit */   
-            new() { x = 618, y = 206, width = 66, height = 16 },  /* boxShuffle */
-            new() { x = 690, y = 254, width = 40, height = 35 },  /* boxEnter */  
-            new() { x = 690, y = 304, width = 40, height = 40 }   /* boxClear */
+            new Box() { x = 612, y =   0, width = 66, height = 30 },  /* boxSolve */  
+            new Box() { x = 686, y =   0, width = 46, height = 30 },  /* boxNew */    
+            new Box() { x = 742, y =   0, width = 58, height = 30 },  /* boxQuit */   
+            new Box() { x = 618, y = 206, width = 66, height = 16 },  /* boxShuffle */
+            new Box() { x = 690, y = 254, width = 40, height = 35 },  /* boxEnter */  
+            new Box() { x = 690, y = 304, width = 40, height = 40 }   /* boxClear */
         };
 
         public static string[] boxnames = ["solve", "new", "quit", "shuffle", "enter", "clear"];
@@ -103,50 +101,50 @@ namespace ag
         public static int answersSought = 0;
         /// <summary>answersGot</summary>
         public static int answersGot = 0;
-        /// <summary>gotBigWord</summary>
+        /// <value>The flag repesenting that the biggest word was found</value>
         public static bool gotBigWord = false;
-        /// <summary>bigWordLen</summary>
+        /// <value>The length of the biggest word</value>
         public static int bigWordLen = 0;
-        /// <summary>updateTheScore</summary>
+        /// <value>The flag representing that the score was updated</value>
         public static bool updateTheScore = false;
-        /// <summary>gamePaused</summary>
+        /// <value>The flag representing that the game was paused</value>
         public static bool gamePaused = false;
-        /// <summary>foundDuplicate</summary>
+        /// <value>The flag representing that a duplicate was found</value>
         public static bool foundDuplicate = false;
-        /// <summary>quitGame</summary>
+        /// <value>the flag representing that quitting the game was requested</value>
         public static bool quitGame = false;
-        /// <summary>winGame</summary>
+        /// <value>The flag representing that the game was won</value>
         public static bool winGame = false;
- 
-        /// <summary>letterSpeed</summary>
+
+        /// <value>The value representing the speed at which the letters move from one box to the other</value>
         public static int letterSpeed = LETTER_FAST;
- 
-        /// <summary>fullscreen</summary>
+
+        /// <value>The flag indicating the full screen selection</value>
         public static bool fullscreen = false;
 
         // SDL summarys
-        /// <summary>window</summary>
+        /// <value>the SDL window</value>
         public static IntPtr window;
 
-        /// <summary>backgroundTex</summary>
+        /// <value>the SDL texture containing the background image</value>
         public static IntPtr backgroundTex = IntPtr.Zero;
-        /// <summary>letterBank</summary>
+        /// <value>The SDL texture containing all the large letters</value>
         public static IntPtr letterBank = IntPtr.Zero;
-        /// <summary>smallLetterBank</summary>
+        /// <value>The SDL texture containing all the small letters</value>
         public static IntPtr smallLetterBank = IntPtr.Zero;
-        /// <summary>numberBank</summary>
+        /// <value>The SDL texture containing all the numbers</value>
         public static IntPtr numberBank = IntPtr.Zero;
         /// <summary>answerBoxUnknown</summary>
         public static IntPtr answerBoxUnknown = IntPtr.Zero;
         /// <summary>answerBoxKnown</summary>
         public static IntPtr answerBoxKnown = IntPtr.Zero;
-        /// <value>The list of sprites representing the time</value>
+        /// <value>The list of sprites containing the graphical time representation</value>
         public static Sprite? clockSprite = null;
-        /// <summary>The list of sprites representing the score</summary>
+        /// <value>The list of sprites containing the graphical score representation</value>
         public static Sprite? scoreSprite = null;
 
         // audio vars
-        /// <summary>audio_enabled</summary>
+        /// <value>The flag representing if the audio is enabled</value>
         public static bool audio_enabled = true;
         /// <summary>audio_len</summary>
         public static uint audio_len;
@@ -166,6 +164,7 @@ namespace ag
             /// <value> Property <c>Next</c> next sound </value>
             public Sound? Next { get; set; } = null;
         }
+
         /// <summary>soundCache</summary>
         public static Sound? soundCache = new(null, IntPtr.Zero);
 
@@ -834,8 +833,8 @@ namespace ag
             {
                 fromRect.x = SCORE_WIDTH * ((int)buffer[i] - 48);
                 toRect.x = SCORE_WIDTH * i;
-                scoreSprite.spr[i].sprite_dimensions = fromRect;
-                scoreSprite.spr[i].x_offset = toRect.x;
+                scoreSprite.sprite[i].sprite_band_dimensions = fromRect;
+                scoreSprite.sprite[i].sprite_x_offset = toRect.x;
             }
         }
 
@@ -862,13 +861,13 @@ namespace ag
             int secondsUnits = seconds % 10;
 
             fromRect.x = CLOCK_WIDTH * minutesTens;
-            clockSprite.spr[0].sprite_dimensions = fromRect;
+            clockSprite.sprite[0].sprite_band_dimensions = fromRect;
             fromRect.x = CLOCK_WIDTH * minutesUnits;
-            clockSprite.spr[1].sprite_dimensions = fromRect;
+            clockSprite.sprite[1].sprite_band_dimensions = fromRect;
             fromRect.x = CLOCK_WIDTH * secondsTens;
-            clockSprite.spr[3].sprite_dimensions = fromRect;
+            clockSprite.sprite[3].sprite_band_dimensions = fromRect;
             fromRect.x = CLOCK_WIDTH * secondsUnits;
-            clockSprite.spr[4].sprite_dimensions = fromRect;
+            clockSprite.sprite[4].sprite_band_dimensions = fromRect;
         }
 
 
@@ -883,7 +882,7 @@ namespace ag
         {
             int a, b;
             char tmp;
-            Random random = new();
+            Random random = new Random();
 
             // generate a random number between 20 and 26. The rand() function in C no longer exists in C#
             // This was done in the initial c app, not sure why. Probably to increase the randomness result?
@@ -899,7 +898,7 @@ namespace ag
             }
 
             // char tmp;
-            
+
             // Random randCount = new Random();
             // int count = randCount.Next(20, 27);
 
@@ -946,7 +945,7 @@ namespace ag
             char[] shufflePos = new char[8];
             int numSwaps;
 
-            Random random = new();
+            Random random = new Random();
 
 
             for (int i = 0; i < 7; i++)
@@ -990,15 +989,14 @@ namespace ag
         /// <param name="letters">letter sprites head node (in/out)</param>
         /// <param name="screen">SDL_Surface to display the image</param>
         /// <returns>Nothing</returns>
-        // TODO: Check if the arguments should be passed by reference
-        public static void BuildLetters(Sprite letters, IntPtr screen)
+        public static void BuildLetters(ref Sprite letters, IntPtr screen)
         {
             Sprite thisLetter = null, previousLetter = null;
 
             SDL.SDL_Rect rect;
             int index = 0;
 
-            Random random = new();
+            Random random = new Random();
 
             rect.y = 0;
             rect.w = GAME_LETTER_WIDTH;
@@ -1016,14 +1014,10 @@ namespace ag
                     rect.x = chr * GAME_LETTER_WIDTH;
                     thisLetter.numSpr = 1;
 
-                    // TODO: check where letterBank is defined twice
-
-                    thisLetter.spr[0].texture = letterBank;
-                    thisLetter.spr[0].sprite_dimensions = rect;
-                    thisLetter.spr[0].x_offset = 0;
-                    thisLetter.spr[0].y_offset = 0;
-                    // TODO: Continue here#######################
-
+                    thisLetter.sprite[0].sprite_band_texture = letterBank;
+                    thisLetter.sprite[0].sprite_band_dimensions = rect;
+                    thisLetter.sprite[0].sprite_x_offset = 0;
+                    thisLetter.sprite[0].sprite_y_offset = 0;
 
                     thisLetter.x = random.Next(800);/*i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X;*/
                     thisLetter.y = random.Next(600); /* SHUFFLE_BOX_Y; */
@@ -1049,18 +1043,172 @@ namespace ag
                 }
 
             }
-        }   
+        }
 
 
-        // STOPPED HERE ###########################
+        /// <summary>add the clock to the sprites
+        /// keep a module reference to it for quick and easy update
+        /// this sets the clock to a fixed 5:00 start 
+        /// </summary>
+        /// <param name="letters">letter sprites head node (in/out)</param>
+        /// <param name="screen">SDL_Surface to display the image</param>
+        /// <returns>Nothing</returns>
+        public static void AddClock(ref Sprite letters, IntPtr screen)
+        {
+            Sprite? thisLetter = new Sprite(5);
+            Sprite? previousLetter = null;
+            Sprite? current = letters;
+            int index = 0;
 
-        public static void newGame(ref Node answers, ref dlb_node dict, IntPtr backgroundTex, IntPtr screen, Sprite letters, char[] rootWord, string wordsListPath = "")
+            SDL.SDL_Rect fromRect;
+            fromRect.x = 0; // probably unnecessary!
+            fromRect.y = 0;
+            fromRect.w = CLOCK_WIDTH;
+            fromRect.h = CLOCK_HEIGHT;
+
+            while (current != null)
+            {
+                previousLetter = current;
+                current = current.next;
+            }
+
+            thisLetter.numSpr = 5;
+
+            // initialise with 05:00
+            // TODO: Probably could be done better - as in using the "AvailableTime" value
+            for (int i = 0; i < 5; i++)
+            {
+
+                switch (i)
+                {
+                    case 0: // tens of mins ("0")
+                        fromRect.x = 0;
+                        break;
+                    case 1:
+                        fromRect.x = 5 * CLOCK_WIDTH; // units of minutes ("5")
+                        break;
+                    case 2:
+                        fromRect.x = 10 * CLOCK_WIDTH; // colon (":")
+                        break;
+                    case 3: // tens of secs ("0")
+                        fromRect.x = 0;
+                        break;
+                    case 4: // units of secs ("0")
+                        fromRect.x = 0;
+                        break;
+                    default:
+                        break;
+                }
+
+                thisLetter.sprite[i].sprite_band_texture = numberBank;
+                thisLetter.sprite[i].sprite_band_dimensions = fromRect;
+                thisLetter.sprite[i].sprite_x_offset = CLOCK_WIDTH * i;
+                thisLetter.sprite[i].sprite_y_offset = 0;
+            }
+
+            thisLetter.x = CLOCK_X;
+            thisLetter.y = CLOCK_Y;
+            thisLetter.h = CLOCK_HEIGHT;
+            thisLetter.w = CLOCK_WIDTH * thisLetter.numSpr;
+            thisLetter.toX = thisLetter.x;
+            thisLetter.toY = thisLetter.y;
+            thisLetter.next = null;
+            thisLetter.box = CONTROLS;
+            thisLetter.index = index++;
+
+            previousLetter.next = thisLetter;
+            clockSprite = thisLetter;
+
+        }
+
+
+        /// <summary> add the Score to the sprites
+        ///  a module reference to it for quick and easy update
+        /// 
+        /// </summary>
+        /// <param name="letters">letter sprites head node (in/out)</param>
+        /// <param name="screen">SDL_Surface to display the image</param>
+        /// <returns>Nothing</returns>
+        public static void AddScore(ref Sprite letters, IntPtr screen)
+        {
+            Sprite? thisLetter = new Sprite(5);
+            Sprite? previousLetter = null;
+            Sprite? current = letters;
+
+            SDL.SDL_Rect fromRect;   // dimensions of the numbers band image in px
+            SDL.SDL_Rect toRect;     // position of the letter in the score box
+
+            int index = 0;
+
+            fromRect.x = 0; // probably not needed?
+            fromRect.y = 0;
+            fromRect.w = SCORE_WIDTH;
+            fromRect.h = SCORE_HEIGHT;
+
+            toRect.y = 0;
+            toRect.w = SCORE_WIDTH;
+            toRect.h = SCORE_HEIGHT;
+
+            while (current != null)
+            {
+                previousLetter = current;
+                current = current.next;
+            }
+
+            // pre-loading: "    0"
+            for (int i = 0; i < 5; i++)
+            {
+                if (i == 0) // rightmost? number "0"
+                {
+                    fromRect.x = 0;
+                }
+                else // space " "
+                {
+                    fromRect.x = SCORE_WIDTH * 11;
+                }
+
+                toRect.x = SCORE_WIDTH * i;
+
+                thisLetter.sprite[i].sprite_band_texture = numberBank;
+                thisLetter.sprite[i].sprite_band_dimensions = fromRect;
+                thisLetter.sprite[i].sprite_x_offset = toRect.x;
+                thisLetter.sprite[i].sprite_y_offset = 0;
+            }
+
+            thisLetter.x = SCORE_X;
+            thisLetter.y = SCORE_Y;
+            thisLetter.h = SCORE_HEIGHT;
+            thisLetter.w = SCORE_WIDTH * 5; // initialise the first score on the RHS of the box
+            thisLetter.toX = thisLetter.x;
+            thisLetter.toY = thisLetter.y;
+            thisLetter.next = null;
+            thisLetter.box = CONTROLS;
+            thisLetter.index = index++;
+
+            previousLetter.next = thisLetter;
+            scoreSprite = thisLetter;
+        }
+
+
+        /// <summary> Do all of the initialisation for a new game:
+        /// build the screen
+        /// get a random word and generate anagrams
+        /// (must get less than 66 anagrams to display on screen)
+        /// initialise all the game control flags
+        /// </summary>
+        /// <param name="headNode">first node in the answers list (in/out)</param>
+        /// <param name="dlbHeadNode">first node in the dictionary list</param>
+        /// <param name="screen">SDL_Surface to display the image</param>
+        /// <param name="letters">first node in the letter sprites (in/out)</param>
+        /// <returns>Nothing</returns>
+        public static void NewGame(ref Node headNode, Dlb_node dlbHeadNode, IntPtr screen, ref Sprite letters)
         {
             // letters in the guess box
             char[] guess = new char[9];
             char[] remain = new char[9];
-            // happy is true if we have <=77 anagrams and => 6
+            // happy is true if we have < 67 anagrams and => 6
             bool happy = false;
+
             int answerSought = 0;
             int bigWordLen = 0;
 
@@ -1069,127 +1217,168 @@ namespace ag
             dest.y = 0;
             dest.w = 800;
             dest.h = 600;
+            SDLScale_RenderCopy(screen, backgroundTex, null, ref dest);
+
+            DestroyLetters(ref letters);
+
+
             //IntPtr temp = BackgroundText
 
-            SDL.SDL_Rect firstrect;
-            firstrect.x = 0;
-            firstrect.y = 0;
-            firstrect.w = 800;
-            firstrect.h = 600;
+            // SDL.SDL_Rect firstrect;
+            // firstrect.x = 0;
+            // firstrect.y = 0;
+            // firstrect.w = 800;
+            // firstrect.h = 600;
 
-            SDLScale_RenderCopy(screen, backgroundTex, ref firstrect, ref dest);
+            // SDLScale_RenderCopy(screen, backgroundTex, ref firstrect, ref dest);
 
             //destroyLetters(letters);
-            Console.WriteLine("About to look for Happy");
+            // Console.WriteLine("About to look for Happy");
+
+
             while (!happy)
             {
                 char[] buffer = new char[9];
-                buffer = GetRandomWord(wordsListPath).ToCharArray();
-                //guess = "".ToCharArray();
-                rootWord = buffer;
-                bigWordLen = rootWord.Length - 1;
+                string bufferString = new string(buffer);
+                GetRandomWord(ref bufferString, buffer.Length);
+                rootword = bufferString.ToCharArray();
+                bigWordLen = rootword.Length;
+                remain = rootword;
 
-                for (int i = 0; i < rootWord.Length; i++) remain[i] = rootWord[i];
-                //remain =rootWord;
+                DestroyAnswers(headNode);
+
+                string guessString = new string(guess);
+                string remainString = new string(remain);
+                Ag(ref headNode, dlbHeadNode, guessString, remainString);
 
 
-                // Not needed in C# as garbage collection is handled already
-                //destroyAnswers(answers);
+                answerSought = Length(headNode);
 
-                answerSought = Length(answers);
-                string newGuessString = new string(guess).Trim('\0');
-                string newRemainString = new string(remain).Trim('\0');
-                Ag(ref answers, dict, newGuessString, newRemainString);
-                guess = newGuessString.ToCharArray();
-                char[] rem = newRemainString.ToCharArray();
-                for (int i = 0; i < newRemainString.Length; i++) remain[i] = rem[i];
-                //remain = newRemainString.ToCharArray();
+                happy = (answerSought <= 77) && (answerSought >= 6);
 
-                answerSought = Length(answers);
-
-                // happy if the number of anagrams are 6 or more, and less than 77
-                happy = ((answerSought < 77) && (answerSought >= 6));
-
-#if DEBUG
-                if (!happy) Console.WriteLine($"Too Many Answers!  word: {new string(rootWord)}, answers: {answerSought}");
-#endif
             }
-            Console.WriteLine("Happy found");
-#if DEBUG
-            if (happy) Console.WriteLine($"Selected word: {new string(rootWord)}, answers: {answerSought}");
-#endif
 
-            Sort(ref answers);
+            /* now we have a good set of words - sort them alphabetically */
+            Sort(ref headNode);
 
             for (int i = bigWordLen; i < 7; i++)
             {
                 remain[i] = SPACE_CHAR;
             }
-            remain[7] = '\0';
-            remain[bigWordLen] = '\0';
+            remain[7] = '0';  // might be superfluous with C#
+            remain[bigWordLen] = '\0'; // might be superfluous with C#
+            ShuffleWord(ref remain);
+            Shuffle = remain;
 
-            ShuffleWord(remain);
-            shuffle = remain;
-            answer = SPACE_FILLED_STRING;
+            Answer = SPACE_FILLED_CHARS.ToCharArray();
 
-            // HERE
+            /* build up the letter sprites */
 
+            BuildLetters(ref letters, screen);
+            AddClock(ref letters, screen);
+            AddScore(ref letters, screen);
 
+            /* display all answer boxes */
+            DisplayAnswerBoxes(headNode, screen);
 
+            gotBigWord = false;
+            score = 0;
+            updateTheScore = true;
+            gamePaused = false;
+            winGame = false;
+            answersGot = 0;
 
+            gameStart = DateTime.Now;
+            gameTime = 0;
+            stopTheClock = false;
         }
 
 
+        //             // buffer = GetRandomWord(wordsListPath).ToCharArray();
+        //             //guess = "".ToCharArray();
+        //             // rootWord = buffer;
+        //             // bigWordLen = rootWord.Length - 1;
+
+        //             for (int i = 0; i < rootWord.Length; i++) remain[i] = rootWord[i];
+        //                 //remain =rootWord;
+
+
+        //                 // Not needed in C# as garbage collection is handled already
+        //                 //destroyAnswers(answers);
+
+        //                 answerSought = Length(answers);
+        //                 string newGuessString = new string(guess).Trim('\0');
+        //                 string newRemainString = new string(remain).Trim('\0');
+        //                 Ag(ref answers, dict, newGuessString, newRemainString);
+        //                 guess = newGuessString.ToCharArray();
+        //                 char[] rem = newRemainString.ToCharArray();
+        //                 for (int i = 0; i < newRemainString.Length; i++) remain[i] = rem[i];
+        //                 //remain = newRemainString.ToCharArray();
+
+        //                 answerSought = Length(answers);
+
+        //                 // happy if the number of anagrams are 6 or more, and less than 77
+        //                 happy = ((answerSought < 77) && (answerSought >= 6));
+
+        // #if DEBUG
+        //                 if (!happy) Console.WriteLine($"Too Many Answers!  word: {new string(rootWord)}, answers: {answerSought}");
+        // #endif
+        //             }
+        //             Console.WriteLine("Happy found");
+        // #if DEBUG
+        //             if (happy) Console.WriteLine($"Selected word: {new string(rootWord)}, answers: {answerSought}");
+        // #endif
+
+        //             Sort(ref answers);
+
+        //             for (int i = bigWordLen; i < 7; i++)
+        //             {
+        //                 remain[i] = SPACE_CHAR;
+        //             }
+        //             remain[7] = '\0';
+        //             remain[bigWordLen] = '\0';
+
+        //             ShuffleWord(remain);
+        //             shuffle = remain;
+        //             answer = SPACE_FILLED_STRING;
+
+        //             // HERE
+
+        // }
 
 
 
-        public static void BuildLetters(ref Sprite letters, IntPtr screen)
+        /// <summary>
+        /// Attempt at rewrite of the timer callback from the original C
+        /// </summary>
+        // public static void TimerCallBack(Object source, ElapsedEventArgs e)
+        public static void TimerCallBack()
         {
-            Sprite thisLetter = new Sprite();
-            Sprite previousLetter = new Sprite();
-            SDL.SDL_Rect rect = new SDL.SDL_Rect();
-            int index = 0;
+            SDL.SDL_UserEvent userEvent = new SDL.SDL_UserEvent();
+            userEvent.type = (uint)SDL.SDL_EventType.SDL_USEREVENT;
+            userEvent.code = 0;
+            userEvent.data1 = IntPtr.Zero;
+            userEvent.data2 = IntPtr.Zero;
 
-            rect.y = 0;
-            rect.w = GAME_LETTER_WIDTH;
-            rect.h = GAME_LETTER_HEIGHT;
+            SDL.SDL_Event sdlEvent = new SDL.SDL_Event();
+            sdlEvent.type = SDL.SDL_EventType.SDL_USEREVENT;
+            sdlEvent.user = userEvent;
 
-            int len = shuffle.Length;
-
-            for (int i=0; i<len; i++)
-
-            {
-                thisLetter.numSpr = 0;
-
-                // determine which letter we're wanting and load it from 
-                // the letterbank*/
-
-                if ((int)shuffle[i] != ASCII_SPACE && shuffle[i] != SPACE_CHAR )
-                {
-                    int chr = (int)(shuffle[i] - 'a');
-                    rect.x = chr * GAME_LETTER_WIDTH;
-                    thisLetter.numSpr = 1;
+            SDL.SDL_PushEvent(ref sdlEvent);
+        }
 
 
-                    thisLetter.spr[0].t = letterBank;
-                    thisLetter.spr[0].w = rect;
-                    thisLetter.spr[0].x = 0;
-                    thisLetter.spr[0].y = 0;
-
-
-                    thisLetter.x = rnd.Next(0, 799); // Dulsi comment did not seem to align with his code: i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X;
-                    thisLetter.y = rnd.Next(0, 599); // Dulsi comment did not seem to align with his code:  SHUFFLE_BOX_Y;
-                    thisLetter.letter = shuffle[i];
-                    thisLetter.h = GAME_LETTER_HEIGHT;
-                    thisLetter.w = GAME_LETTER_WIDTH;
-                    thisLetter.toX = i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X;
-                    thisLetter.toY = SHUFFLE_BOX_Y;
-                }
-            }
-
+        public static void GameLoop(Node headNode, Dlb_node dldHeadNode, IntPtr screen, Sprite letters)
+        {
+            bool done = false;
+            SDL.SDL_Event sdlEvent;
+            DateTime timeNow;
+            SDL.SDL_INIT_TIMER.SDL_timerID timer;
 
 
         }
-// HERE TOO
+
+
+
     }
 }
