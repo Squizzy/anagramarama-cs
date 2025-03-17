@@ -8,7 +8,7 @@ namespace ag
         /// <param name="screen">The renderer to display on</param>
         /// <param name="movie">The sprite to use</param>
         /// <returns>Nothing</returns>
-        public static void ShowSprite(ref IntPtr screen, ref Sprite movie)
+        public static void ShowSprite(ref IntPtr screen, Sprite movie)
         {
             SDL.SDL_Rect rect = new()
             {
@@ -58,7 +58,7 @@ namespace ag
         /// <param name="movie">The sprite to move</param>
         /// <param name="letterSpeed">The speed to move the sprite at</param>
         /// <returns>Nothing</returns>
-        public static void MoveSprite(ref IntPtr screen, ref Sprite movie, int letterSpeed)
+        public static void MoveSprite(ref IntPtr screen, Sprite movie, int letterSpeed)
         {
             int Xsteps;
 
@@ -98,21 +98,21 @@ namespace ag
         /// <param name="letters">the sprites to move</param>
         /// <param name="letterSpeed">the speed of the move</param>
         /// <returns>Nothing</returns>
-        public static void MoveSprites(IntPtr screen, Sprite letters, int letterSpeed)
+        public static void MoveSprites(ref IntPtr screen, Sprite letters, int letterSpeed)
         {
             Sprite current;
 
             current = letters;
             while (current != null)
             {
-                MoveSprite(ref screen, ref current, letterSpeed);
+                MoveSprite(ref screen, current, letterSpeed);
                 current = current.next;
             }
 
             current = letters;
             while (current != null)
             {
-                ShowSprite(ref screen, ref current);
+                ShowSprite(ref screen, current);
                 current = current.next;
             }
             SDL.SDL_RenderPresent(screen);
