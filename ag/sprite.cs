@@ -20,11 +20,11 @@ namespace ag
 
             for (int i = 0; i < movie.numSpr; i++)
             {
-                rect.x = movie.x + movie.spr[i].x_offset;
-                rect.y = movie.y + movie.spr[i].y_offset;
-                rect.w = movie.spr[i].sprite_dimensions.w;
-                rect.h = movie.spr[i].sprite_dimensions.h;
-                SDLScale_RenderCopy(screen, movie.spr[i].texture, ref movie.spr[i].sprite_dimensions, ref rect);
+                rect.x = movie.x + movie.sprite[i].sprite_x_offset;
+                rect.y = movie.y + movie.sprite[i].sprite_y_offset;
+                rect.w = movie.sprite[i].sprite_band_dimensions.w;
+                rect.h = movie.sprite[i].sprite_band_dimensions.h;
+                SDLScale_RenderCopy(screen, movie.sprite[i].sprite_band_texture, movie.sprite[i].sprite_band_dimensions, ref rect);
             }
         }
 
