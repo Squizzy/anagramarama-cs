@@ -42,7 +42,7 @@ namespace ag
         /// <param name="w">width factor</param>
         /// <param name="h">height factor</param>
         /// <returns>Nothing</returns>
-        public static void SDLScale_set(double w, double h)
+        public static void SDLScaleSet(double w, double h)
         {
             scalew = w;
             scaleh = h;
