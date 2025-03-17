@@ -17,7 +17,7 @@ namespace ag
     partial class Program
     {
         /// <value> Property <c>letterBank</c> is the band of letter pic once loaded in the app</value>
-        public static IntPtr letterBank;
+        // public static IntPtr letterBank;
         
         
         // method to identify the local language path for the locale files (dictionarity, background, ...)
