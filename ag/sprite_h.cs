@@ -28,13 +28,13 @@ namespace ag
         /// </summary>
         public struct Element
         {
-            /// <value> Property <c>t</c> texture of the sprite </value>
+            /// <value> Property <c>t</c>texture of the sprite</value>
             /// <remarks>(SDL_Texture *t) For some reason SDL2.SDL.SDL_Texture has not been defined in for c#, so using IntPtr</remarks>
-            public IntPtr texture;
+            public IntPtr sprite_band_texture;
             /// <value>SDL_rect dimentions of the sprite</value>
-            public SDL.SDL_Rect sprite_dimensions;
+            public SDL.SDL_Rect sprite_band_dimensions;
             /// <value>Sprite graphic offset from the top left position of the band image</value>
-            public int x_offset, y_offset;
+            public int sprite_x_offset, sprite_y_offset;
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace ag
         public class Sprite
         {
             /// <value> Property <c>spr</c>The graphical representation</value>
-            public required Element[] spr;
-            /// <value> Property <c>numSpr</c> **??** </value>
+            public Element[] sprite { get; set; }
+            /// <value>The number of spr elements in this Sprite</value>
             public int numSpr;
             /// <value> Property <c>letter</c> the actual letter value </value>
             public char letter;
@@ -68,12 +68,15 @@ namespace ag
             /// <value> Property <c>box</c> the box in which this letter should be placed </value>
             public int box;
             
-
+            /// <summary> constructor for Sprite
+            /// </summary>
+            /// <param name="numOfElements">The number of sprite elements</param>
             public Sprite (int numOfElements)
             {
-                Element[] spr = new Element[numOfElements];
+                sprite = new Element[numOfElements];
                 // spr[0] = null;
                 numSpr = 0;
+                letter = '\0';
                 x = y = w = h = 0;
                 toX = toY = 0;
                 next = null;
