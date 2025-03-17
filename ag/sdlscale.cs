@@ -11,7 +11,7 @@ namespace ag
         /// <summary> identify the location of the mouse event if the window was scaled </summary>
         /// <param name="mouseEvent">the mouse event</param>
         /// <returns>Nothing</returns>
-        public void SDLScale_MouseEvent(SDL.SDL_Event mouseEvent)
+        public static void SDLScale_MouseEvent(ref SDL.SDL_Event mouseEvent)
         {
             mouseEvent.button.x = mouseEvent.button.x / (int)scalew;
             mouseEvent.button.y = mouseEvent.button.y / (int)scaleh;
