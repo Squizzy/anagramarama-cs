@@ -1554,7 +1554,7 @@ namespace ag
                             {
                                 double scalew = sdlEvent.window.data1 / 800.0;
                                 double scaleh = sdlEvent.window.data2 / 600.0;
-                                SDLScale_Set(scalew, scaleh);
+                                SDLScaleSet(scalew, scaleh);
                             }
                         }
                         SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
@@ -1589,7 +1589,7 @@ namespace ag
         public static bool ConfigBox(Box pbox, string line)
         {
             int x, y, w, h;
-            
+
         }
 
     }
