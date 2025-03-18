@@ -52,7 +52,7 @@ namespace ag
         public class Sprite
         {
             /// <value> Property <c>spr</c>The graphical representation</value>
-            public Element[] sprite { get; set; }
+            public Element[] sprite;
             /// <value>The number of spr elements in this Sprite</value>
             public int numSpr;
             /// <value> Property <c>letter</c> the actual letter value </value>
@@ -67,14 +67,20 @@ namespace ag
             public int index;
             /// <value> Property <c>box</c> the box in which this letter should be placed </value>
             public int box;
-            
+
             /// <summary> constructor for Sprite
             /// </summary>
-            /// <param name="numOfElements">The number of sprite elements</param>
-            public Sprite (int numOfElements)
+            // / <param name="numOfElements">The number of sprite elements</param>
+            public Sprite(int numOfElements)
             {
                 sprite = new Element[numOfElements];
-                // spr[0] = null;
+                for (int i = 0; i < numOfElements; i++)
+                    {
+                        sprite[i].sprite_band_texture = IntPtr.Zero; // or some valid texture
+                        sprite[i].sprite_band_dimensions = new SDL.SDL_Rect();
+                        sprite[i].sprite_x_offset = 0;
+                        sprite[i].sprite_y_offset = 0;
+                    };
                 numSpr = 0;
                 letter = '\0';
                 x = y = w = h = 0;
@@ -84,6 +90,5 @@ namespace ag
                 box = 0;
             }
         }
-
     }
 }
