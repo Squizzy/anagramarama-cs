@@ -13,9 +13,10 @@ namespace ag
 
     public partial class Program
     {
+        /// <value>The positioning name of the hotboxes, used in that order in hotbox</value>
+        enum HotBoxes { boxSolve, boxNew, boxQuit, boxShuffle, boxEnter, boxClear };
 
-        public enum HotBoxes { boxSolve, boxNew, boxQuit, boxShuffle, boxEnter, boxClear };
-
+        /// <value>The hodboxes default positions and dimensions</value>
         public static Box[] hotbox = new Box[]
         {
             new Box() { x = 612, y =   0, width = 66, height = 30 },  /* boxSolve */  
@@ -26,6 +27,7 @@ namespace ag
             new Box() { x = 690, y = 304, width = 40, height = 40 }   /* boxClear */
         };
 
+        /// <value>The name of the hotboxes</value>
         public static string[] boxnames = ["solve", "new", "quit", "shuffle", "enter", "clear"];
 
         // shuffle is an array that can be modified so it needs to have a field that is set and get
@@ -280,7 +282,7 @@ namespace ag
 
             // load the BMP file into a surface
             imageSurf = SDL.SDL_LoadBMP(file);
-            if (imageSurf == null)
+            if (imageSurf == IntPtr.Zero)
             {
                 Console.WriteLine("Couldn't load %s: %s\n", file, SDL.SDL_GetError());
             }
@@ -302,7 +304,7 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void DisplayAnswerBoxes(Node headNode, IntPtr screen)
         {
-            Node current = headNode;
+            Node? current = headNode;
             SDL.SDL_Rect outerRect, innerRect, letterBankRect;
             int numWords = 0;
             int acrossOffset = 70;
@@ -409,7 +411,7 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void SolveIt(Node headNode)
         {
-            Node current = headNode;
+            Node? current = headNode;
 
             while (current != null)
             {
@@ -425,9 +427,9 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void CheckGuess(string answer, Node headNode)
         {
-            Node current = headNode;
+            Node? current = headNode;
             bool foundWord = false;
-            bool foundAllLengths = true;
+            //bool foundAllLength = true; // used for Gamerzilla - ignored here
             char[] test = new char[8];
 
             int len = NextBlank(answer) - 1;
@@ -495,7 +497,7 @@ namespace ag
             {
                 if ((!current.found) && (len == current.anagram.Length))
                 {
-                    foundAllLengths = false;
+                    //foundAllLength = false; // used for gamerzilla - ignored here
                 }
                 current = current.next;
             }
@@ -575,7 +577,7 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void HandleKeyboardEvent(SDL.SDL_Event SDLevent, Node headNode, Sprite letters)
         {
-            Sprite current = letters;
+            Sprite? current = letters;
             var keyedLetter = SDLevent.key.keysym.sym;
             int maxIndex = 0;
 
@@ -699,7 +701,7 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void ClickDetect(int button, int x, int y, IntPtr screen, Node headNode, Sprite letters)
         {
-            Sprite current = letters;
+            Sprite? current = letters;
 
             if (!gamePaused)
             {
@@ -942,7 +944,7 @@ namespace ag
         /// <returns>Nothing as passed by reference</returns>
         public static void ShuffleAvailableLetters(ref string word, ref Sprite letters)
         {
-            Sprite thisLetter = letters;
+            Sprite? thisLetter = letters;
             int from, to;
             char swap, posSwap;
             // char[] shuffleChars = new char[8];
@@ -997,7 +999,7 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void BuildLetters(ref Sprite letters, IntPtr screen)
         {
-            Sprite thisLetter = null, previousLetter = null;
+            Sprite? thisLetter = null, previousLetter = null;
 
             SDL.SDL_Rect rect;
             int index = 0;
@@ -1403,7 +1405,7 @@ namespace ag
         ///
         /// finally, move the sprites - this is always called so the sprites 
         /// are always considered to be moving no "move sprites" event exists 
-        /// - sprites x&y just needs to be updated and they will always be moved
+        /// - sprites x and y just needs to be updated and they will always be moved
         /// </summary>
         /// <param name="headNode">first node in the answers list (in/out)</param>
         /// <param name="dldHeadNode">first node in the dictionary list</param>
