@@ -91,7 +91,7 @@ namespace ag
         /// </summary>
         /// <param name="headNode">the head node</param>
         /// <returns>Nothing</returns>
-        public static void DestroyAnswers(Node? headNode)
+        public static void DestroyAnswers(ref Node? headNode)
         {
             headNode = null;
         }
