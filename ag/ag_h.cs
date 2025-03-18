@@ -2,6 +2,8 @@
 // Preprocessors defines are replaced with const
 // Variable strings are set with get/set for more security controls
 
+using System.Reflection.Metadata;
+
 namespace ag
 {
 
@@ -92,7 +94,25 @@ namespace ag
         public const int AVAILABLE_TIME = 300;
 
         /// <value> Path to the locale dictionary </value>
-        public const string DEFAULT_LOCALE_PATH = "i18n/en_GB";
+        static string DEFAULT_LOCALE_PATH = "i18n" + DIR_SEP + "en_GB" + DIR_SEP;
+        // public const string DEFAULT_LOCALE_PATH = "i18n/en_GB";
 
+        /// <value> directory separator for the OS used </value>
+        static char DIR_SEP = Path.DirectorySeparatorChar;
+
+        /// <value>subdirectory where the audio is stored</value>
+        static string audioSubPath = "audio" + DIR_SEP;
+
+        /// <value>subdirectory for internationalised content</value>
+        static string i18nPath = "i18n" + DIR_SEP;
+
+        /// <value>subdirectory where the audio is stored</value>
+        static string imagesSubPath = "images" + DIR_SEP;
+
+        /// <value>subdirectory where the internationalised content is stored (dict, images)</value>
+        static string localePath = "";
+
+        /// <value>the size of the biggest word to be used in the game</value>
+        public const int  MAX_ANAGRAM_LENGTH = 7;
     }
 }
