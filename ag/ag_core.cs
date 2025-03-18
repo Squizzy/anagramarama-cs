@@ -60,42 +60,51 @@ namespace ag
 
             int totalLen = 0, guessLen = 0, remainLen = 0;
 
-            guessLen = guess.Length;
-            remainLen = remain.Length;
+            guessLen = guess.Trim().Length;
+            remainLen = remain.Trim().Length;
             totalLen = guessLen + remainLen;
 
             // add the element at last position of newRemain to newGuess
-            newGuess[guessLen] = newRemain[remainLen - 1];
+            // newGuess[guessLen] = newRemain[remainLen - 1];
+            guess = guess[0..(guess.Length)] + remain[(remain.Length-1)..];
 
             // remove the last element of newRemain
-            newRemain = newRemain[..^1];
+            // newRemain = newRemain[..^1];
+            remain = remain[..^1];
 
             // If the newGuess word is more than 3 char
-            if (newGuess.Length > 3)
+            // if (newGuess.Length > 3)
+            if (guess.Length > 3)
             {
                 // Shift its letters left dropping the first one
-                string shiftLeftKilledString = ShitfLeftKill(new string(newGuess));
+                // string shiftLeftKilledString = ShitfLeftKill(new string(newGuess));
+                string shiftLeftKilledString = ShitfLeftKill(guess);
 
                 // If this is a word in the dictionary, add it to the anagrams linkedlist
-                if (Dlb_lookup(dlbHeadNode, shiftLeftKilledString))
+                if (DlbLookup(dlbHeadNode, shiftLeftKilledString))
                 {
                     Push(ref headNode, shiftLeftKilledString);
                 }
             }
 
-            if (newRemain.Length > 0)
+            // if (newRemain.Length > 0)
+            if (remain.Length > 0)
             {
                 // Recursively check other words
-                Ag(ref headNode, dlbHeadNode, new string(newGuess), new string(newRemain));
+                Ag(ref headNode, dlbHeadNode, guess, remain);
+                // Ag(ref headNode, dlbHeadNode, new string(newGuess), new string(newRemain));
 
                 // Then for all the total letters
                 for (int i = totalLen - 1; i > 0; i--)
                 {
                     // recursively try all the combinations of newRemain letters with the guess
-                    if (newRemain.Length > i)
+                    if (remain.Length > i)
+                    // if (newRemain.Length > i)
                     {
-                        newRemain = ShiftLeft(new string(newRemain)).ToCharArray();
-                        Ag(ref headNode, dlbHeadNode, new string(newGuess), new string(newRemain));
+                        remain = ShiftLeft(remain);
+                        // newRemain = ShiftLeft(new string(newRemain)).ToCharArray();
+                        Ag(ref headNode, dlbHeadNode, guess, remain);
+                        // Ag(ref headNode, dlbHeadNode, new string(newGuess), new string(newRemain));
                     }
                 }
             }
@@ -154,7 +163,7 @@ namespace ag
         {
             string randomWordTemp;
 
-            string filename = DictLanguagePath() + "wordlist.txt";
+            string filename = language + "wordlist.txt";
 
             string[] lines = File.ReadAllLines(filename);
 
