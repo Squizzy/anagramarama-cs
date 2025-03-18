@@ -1,6 +1,8 @@
 using System.Diagnostics.Tracing;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Microsoft.VisualBasic;
 using SDL2;
 
@@ -68,12 +70,13 @@ namespace ag
             }
         }
 
-        /// <summary>language</summary>
-        public static char[] language = new char[256];
-        /// <summary>userPath</summary>
-        public static char[] userPath = new char[256];
-        /// <summary>basePath</summary>
-        public static char[] basePath = new char[256];
+        /// <value>the path to the locale language to use for the game (where the worldlist.txt is)</value>
+        public static string? language;
+        /// <value>the path to the locale data to use for the game. Used for Gamerzilla, which is not implemented here</value>
+        /// https://jimrich.sk/environment-specialfolder-on-windows-linux-and-os-x/
+        public static string? userPath;
+        /// <value>the base path for the game. Used for Gamerzilla, which is not implemented here</value>
+        public static string? basePath;
         /// <summary>txt</summary>
         public static char[] txt = new char[256];
         /// <summary>rootword</summary>
@@ -1585,12 +1588,165 @@ namespace ag
         }
 
 
-
-        public static bool ConfigBox(Box pbox, string line)
+        /// <summary> parse a config line eg: solve = 555 30 76 20
+        /// Modified from the original to 
+        ///  1) use regex
+        ///  2) identify the box
+        ///  3) make use of return value to apply the config or not (safer)
+        /// </summary>
+        /// <param name="line">the line to be parsed</param>
+        /// <returns>true if the config was found and applied, otherwise false</returns>
+        public static (bool, int?, Box?) ConfigBox(string line)
         {
-            int x, y, w, h;
+            string configRegex = @"^\b(?<box>(?i)solve|new|quit|shuffle|enter|clear(?-i))\b\s=\s(?<x>[0-9]{1,3})\s(?<y>[0-9]{1,3})\s(?<width>[0-9]{1,3})\s(?<height>[0-9]{1,3})";
+            Regex rg = new Regex(configRegex);
+
+            Match configMatch = rg.Match(line);
+
+            if (configMatch.Success)
+            {
+                string configHotboxName = configMatch.Groups["box"].ToString();
+                int configHotboxIndex = Array.FindIndex(boxnames, x => x == configHotboxName);
+                if (configHotboxIndex == -1) // not a Hotbox config
+                {
+                    return (false, null, null);
+                }
+                Box configHotbox = new Box
+                {
+                    x = int.Parse(configMatch.Groups["x"].ToString()),
+                    y = int.Parse(configMatch.Groups["y"].ToString()),
+                    width = int.Parse(configMatch.Groups["width"].ToString()),
+                    height = int.Parse(configMatch.Groups["height"].ToString())
+                };
+                return (true, configHotboxIndex, configHotbox);
+            }
+            return (false, null, null);
+        }
+
+        /// <summary> read any locale-specific configuration information from an ini file. 
+        /// This can reconfigure the positions of the boxes to account for different word sizes 
+        /// or alternative background layouts
+        /// </summary>
+        /// <param name="path"></param>
+        public static void LoadConfig(string path)
+        {
+            using StreamReader sr = new StreamReader(path);
+            string? line = sr.ReadLine();
+            while (line != null)
+            {
+                (bool isConfigBox, int? boxIndex, Box? boxDimensions) = ConfigBox(line);
+                if (isConfigBox && boxIndex != null && boxDimensions != null)
+                {
+                    hotbox[(int)boxIndex] = (Box)boxDimensions;
+                }
+            }
+        }
+
+        /// <summary>Get the current language string from the environment. 
+        ///  This is used to location the wordlist and other localized resources.
+        ///  Sets the global variable 'language' 
+        ///  defaults to the default value
+        /// </summary>
+        /// <param name="prefix">a path prefix</param>
+        /// <returns>true if language was set to a value that had valid "wordslist.txt" else false</returns>
+        public static bool InitLocalePrefix(string prefix)
+        {
+            // prefix is the local folder where the language specifics are stored (ie in addition to "i18n/")
+            CultureInfo currentCulture = CultureInfo.CurrentCulture;
+            string culture = currentCulture.Name; // eg en-GB
+
+            language = prefix;
+            if ((language[0] != 0) && (language[language.Length] != '/'))
+            {
+                // TODO: check if this is the most portable way to do this
+                language += '/';
+            }
+            language += "i18n/" + culture;
+            if (IsValidLocale(language))
+            {
+                return true;
+            }
+
+            int lastIndexOfDot = language.LastIndexOf('.');
+            if (lastIndexOfDot != -1)
+            {
+                language = language[..lastIndexOfDot];
+                if (IsValidLocale(language))
+                {
+                    return true;
+                }
+            }
+
+            int lastIndexOfUnderscore = language.LastIndexOf('_');
+            if (lastIndexOfUnderscore != -1)
+            {
+                language = language[..lastIndexOfUnderscore];
+                if (IsValidLocale(language))
+                {
+                    return true;
+                }
+            }
+
+            // TODO: If there is a problem with windows, check the windows specific implementation in the original C app
+
+            // last resort: use the default locale
+            language = prefix;
+            if ((language[0] != 0) && (language[language.Length] != '/'))
+            {
+                // TODO: check if this is the most portable way to do this
+                language += '/';
+            }
+            language += DEFAULT_LOCALE_PATH;
+
+            return IsValidLocale(language);
+        }
+
+
+        /// <summary>set the language string using command line argument if available.
+        ///  This is used to location the wordlist and other localized resources.
+        ///  Sets the global variable 'language' if command line argument was valid.
+        ///  otherwise calls the InitLocalPrefix
+        /// </summary>
+        /// <param name="args">the command line arguments passed to the application</param>
+        /// <returns>Nothing</returns>
+        public static void InitLocale(string[] args)
+        {
+            language = "i18n/";
+
+            if (args[1] != null)
+            {
+                language += args[1];
+                if (IsValidLocale(language))
+                {
+                    return;
+                }
+            }
+
+            InitLocalePrefix("");
 
         }
+
+
+        /// <summary> not used. Used for Gamerzilla, which is not implemented here</summary>
+        /// <returns>Nothing</returns>
+        public static void GetUserPath()
+        {
+            string? env = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            if (env == null)
+            {
+                env = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.local/share/";
+            }
+
+            userPath = env + "/anagramarama/";
+        }
+
+
+        /// <summary> not used. Used for Gamerzilla, which is not implemented here</summary>
+        /// <returns>Nothing</returns>
+        public static void GetBasePath()
+        {
+            basePath = "./";
+        } 
 
     }
 }
