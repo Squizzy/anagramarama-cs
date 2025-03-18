@@ -12,7 +12,7 @@ namespace ag
         /// </summary>
         /// <param name="c">The character for the new node.</param>
         /// <returns>The newly created Dlb_node</returns>
-        public static Dlb_node Dlb_node_create_node(char c)
+        public static Dlb_node DlbNodeCreateNode(char c)
         {
             Dlb_node newNode = new()
             {
@@ -28,12 +28,12 @@ namespace ag
         /// Destructor for a Dlb_node node. 
         /// Not really needed in c# but kept for sake of keeping...
         /// </summary>
-        /// <param name="Node">The node to be cleared</param>
+        /// <param name="dlbHeadNode">The node to be cleared</param>
         /// <returns>Nothing</returns>
 
-        public static void Dlb_free_node(Dlb_node? Node)
+        public static void DlbFreeNode(Dlb_node? dlbHeadNode)
         {
-            Node = null;
+            dlbHeadNode = null;
         }
 
 
@@ -43,19 +43,19 @@ namespace ag
         /// This method just walks the whole linkedlist and clears all the nodes.
         /// Not really needed in c# but kept for sake of keeping...
         /// </summary>
-        /// <param name="node">The node to be freed</param>
+        /// <param name="dlbHeadNode">The node to be freed</param>
         /// <param name="op">The method to be called to be applied to the node (in this app: free the memory)</param>
         /// <returns>Nothing</returns>
-        public static void Dlb_walk(ref Dlb_node? node, Dlb_node_operation op)
+        public static void DlbWalk(ref Dlb_node? dlbHeadNode, Dlb_node_operation op)
         {
-            while (node != null)
+            while (dlbHeadNode != null)
             {
-                Dlb_node tempNode = node;
-                if (node.child != null)
+                Dlb_node tempNode = dlbHeadNode;
+                if (dlbHeadNode.child != null)
                 {
-                    Dlb_walk(ref node.child, op);
+                    DlbWalk(ref dlbHeadNode.child, op);
                 }
-                node = node.sibling;
+                dlbHeadNode = dlbHeadNode.sibling;
                 op(tempNode);
             }
         }
@@ -66,9 +66,9 @@ namespace ag
         /// </summary>
         /// <param name="headNode">The headnode of the dictionary to clear</param>
         /// <returns>Nothing</returns>
-        public static void Dlb_free(ref Dlb_node? headNode)
+        public static void DlbFree(ref Dlb_node? headNode)
         {
-            Dlb_walk(ref headNode, Dlb_free_node);
+            DlbWalk(ref headNode, DlbFreeNode);
         }
 
         
@@ -76,16 +76,16 @@ namespace ag
         /// add a new word to the De La Briandais Trie Dlb dicionary linked list
         /// load a new word into the dictionary link list, taking into account children and siblings possibilities.
         /// </summary>
-        /// <param name="dlbHead">The head node of the dictionary</param>
+        /// <param name="dlbHeadNode">The head node of the dictionary</param>
         /// <param name="word">The word to insert in the linked list</param>
         /// <returns>Nothing</returns>
-        public static void Dlb_push(ref Dlb_node? dlbHead, string word)
+        public static void DlbPush(ref Dlb_node? dlbHeadNode, string word)
         {
-            Dlb_node? current = dlbHead;
+            Dlb_node? current = dlbHeadNode;
             Dlb_node? previous = null;
             bool child = false;
             bool sibling = false;
-            bool newHead = dlbHead == null;
+            bool newHead = dlbHeadNode == null;
 
             while (word.Length > 0)
             {
@@ -95,10 +95,10 @@ namespace ag
                 // This position can be reached when starting a new head (new dictionary linked list), 
                 // or current had been set to previous - which means child or sibling will have been set
                 {
-                    current = Dlb_node_create_node(letter);
+                    current = DlbNodeCreateNode(letter);
                     if (newHead)
                     {
-                        dlbHead = current;
+                        dlbHeadNode = current;
                         newHead = false;
                     }
                     if (child)
@@ -150,11 +150,11 @@ namespace ag
         /// This method is used to create a dictionary linked list from a file. 
         /// It reads each line of the file, adds the words to the dictionary, and sets the necessary links between nodes. 
         /// </summary>
-        /// <param name="dlbHead">The head node of the dictionary.</param>
+        /// <param name="dlbHeadNode">The head node of the dictionary.</param>
         /// <param name="filename">The name of the file containing the dictionary words.</param>
         /// <returns>Nothing</returns>
 
-        public static void Dlb_create(ref Dlb_node? dlbHead, string filename)
+        public static bool DlbCreate(ref Dlb_node? dlbHeadNode, string filename)
         {
             int lineCount = File.ReadLines(filename).Count();
             string? currentWord;
@@ -167,18 +167,20 @@ namespace ag
                     currentWord = sr.ReadLine();
                     if (currentWord != null)
                     {
-                        Dlb_push(ref dlbHead, currentWord);
+                        DlbPush(ref dlbHeadNode, currentWord);
                     }
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine("Exception: " + e.Message);
+                return false;
             }
             finally
             {
                 Console.WriteLine("executing final block");
             }
+            return true;
 
         }
 
@@ -188,12 +190,12 @@ namespace ag
         /// Determine if a given word is in the dictionary 
         /// essentially the same as a push, but doesn't add any of the new letters
         /// </summary>
-        /// <param name="dlbHead">the dictionary linked list</param>
+        /// <param name="dlbHeadNode">the dictionary linked list</param>
         /// <param name="word">the word to find</param>
         /// <returns> return true if the word is in the dictionary else return false </returns>
-        public static bool Dlb_lookup(Dlb_node? dlbHead, string word)
+        public static bool DlbLookup(Dlb_node? dlbHeadNode, string word)
         {
-            Dlb_node? current = dlbHead;
+            Dlb_node? current = dlbHeadNode;
             Dlb_node? previous;
             // bool retval = false;
             bool wordInDictionary = false;
