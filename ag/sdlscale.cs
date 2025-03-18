@@ -33,8 +33,22 @@ namespace ag
             dstReal.y = (int)(dstRect.y * scaleh);
             dstReal.h = (int)(dstRect.h * scaleh);
             dstReal.w = (int)(dstRect.w * scalew);
-            // TODO: Handle error check
-            _ = SDL.SDL_RenderCopy(renderer, texture, ref srcRect, ref dstReal);
+            // TODO: Handle SDL error check
+
+            SDL.SDL_Rect srcRectSent = new SDL.SDL_Rect();
+            if (srcRect == null)
+            {
+                srcRectSent.x = 0;
+                srcRectSent.y = 0;
+                srcRectSent.w = 0;
+                srcRectSent.h = 0;
+            }
+            else
+            {
+                srcRectSent = (SDL.SDL_Rect)srcRect;
+            }
+            
+            SDL.SDL_RenderCopy(renderer, texture, ref srcRectSent, ref dstReal);
 
         }
 
