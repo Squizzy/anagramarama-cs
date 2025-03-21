@@ -676,17 +676,20 @@ namespace ag
                         {
                             if (current.box == SHUFFLE)
                             {
-                                current.toX = NextBlankPosition(ANSWER, current.index);
-                                current.toY = ANSWER_BOX_Y;
-                                current.box = ANSWER;
-                                if (audio_enabled)
+                                if (current.letter == (char)keyedLetter)
                                 {
-                                    SDL_mixer.Mix_PlayChannel(-1, GetSound("click-shuffle"), 0);
+                                    current.toX = NextBlankPosition(ANSWER, current.index);
+                                    current.toY = ANSWER_BOX_Y;
+                                    current.box = ANSWER;
+                                    if (audio_enabled)
+                                    {
+                                        SDL_mixer.Mix_PlayChannel(-1, GetSound("click-shuffle"), 0);
+                                    }
+                                    break;
                                 }
-                                break;
                             }
+                            current = current.next;
                         }
-                        current = current.next;
                         break;
                 }
             }
@@ -845,17 +848,20 @@ namespace ag
         }
 
 
+        // TODO: Probably remove the signature argument.
         /// <summary>Displays the score graphically</summary>
         /// <param name="screen">the SDL_Surface to display the image</param>
         /// <returns>Nothing</returns>
         private static void UpdateScore(IntPtr screen)
         {
-            SDL.SDL_Rect fromRect, toRect, blankRect;
+            SDL.SDL_Rect fromRect;
+            SDL.SDL_Rect toRect;
+            // , blankRect;
 
-            blankRect.x = SCORE_WIDTH * 11;
-            blankRect.y = 0;
-            blankRect.w = SCORE_WIDTH;
-            blankRect.h = SCORE_HEIGHT;
+            // blankRect.x = SCORE_WIDTH * 11;
+            // blankRect.y = 0;
+            // blankRect.w = SCORE_WIDTH;
+            // blankRect.h = SCORE_HEIGHT;
 
             fromRect.x = 0;
             fromRect.y = 0;
@@ -868,12 +874,12 @@ namespace ag
 
             string buffer = totalScore.ToString();
 
-            scoreSprite = new Sprite(buffer.Length);
+            // scoreSprite = new Sprite(buffer.Length);
 
             for (int i = 0; i < buffer.Length; i++)
             {
-                fromRect.x = SCORE_WIDTH * ((int)buffer[i] - 48);
-                toRect.x = SCORE_WIDTH * i;
+                fromRect.x = SCORE_WIDTH * (buffer[i] - 48); // The correct digit image from the band - 48 is the base ascii 'a'
+                toRect.x = SCORE_WIDTH * i; // The location in the score box
                 scoreSprite.sprite[i].sprite_band_dimensions = fromRect;
                 scoreSprite.sprite[i].sprite_x_offset = toRect.x;
             }
@@ -886,18 +892,18 @@ namespace ag
         public static void UpdateTime(IntPtr screen)
         {
             SDL.SDL_Rect fromRect;
-            fromRect.x = 0; // position on the numberbank band (x CLOCKWIDTH)
+            fromRect.x = 0; // position on the numberbank band (x CLOCKWIDTH) - not necessary as defined below - // TODO: Remove later
             fromRect.y = 0; // position on the numberbank band (x CLOCKHEIGHT) - but as only one line, always 0
             fromRect.w = CLOCK_WIDTH; // width of the character in the timebox in px
             fromRect.h = CLOCK_HEIGHT; // height of the character in px
 
             int thisTime = AVAILABLE_TIME - gameTime;
-            TimeSpan timeSpan = TimeSpan.FromSeconds(thisTime);
+            TimeSpan remainingTime = TimeSpan.FromSeconds(thisTime);
 
-            int minutes = timeSpan.Minutes;
+            int minutes = remainingTime.Minutes;
             int minutesTens = minutes / 10;
             int minutesUnits = minutes % 10;
-            int seconds = timeSpan.Seconds;
+            int seconds = remainingTime.Seconds;
             int secondsTens = seconds / 10;
             int secondsUnits = seconds % 10;
 
@@ -907,9 +913,9 @@ namespace ag
             fromRect.x = CLOCK_WIDTH * minutesUnits;
             clockSprite.sprite[1].sprite_band_dimensions = fromRect;
             fromRect.x = CLOCK_WIDTH * secondsTens;
-            clockSprite.sprite[2].sprite_band_dimensions = fromRect;
-            fromRect.x = CLOCK_WIDTH * secondsUnits;
             clockSprite.sprite[3].sprite_band_dimensions = fromRect;
+            fromRect.x = CLOCK_WIDTH * secondsUnits;
+            clockSprite.sprite[4].sprite_band_dimensions = fromRect;
 
             // tick out the last 10 seconds
             if (thisTime <= 10 && thisTime > 0)
@@ -1221,6 +1227,7 @@ namespace ag
 
             thisLetter = new Sprite(5); // 5 characters in the score
             // previousLetter = new Sprite(5);
+            thisLetter.numSpr = 5;
 
             // pre-loading: "    0"
             for (int i = 0; i < 5; i++)
