@@ -28,7 +28,7 @@ namespace ag
         public static void SDLScale_RenderCopy(IntPtr renderer, IntPtr texture, SDL.SDL_Rect? srcRect, SDL.SDL_Rect? dstRect)
         {
 
-            if (dstRect != null)
+            if (dstRect.HasValue)
             {
                 SDL.SDL_Rect dstReal;
                 SDL.SDL_Rect dstRectToSend = (SDL.SDL_Rect)dstRect;
@@ -38,10 +38,9 @@ namespace ag
                 dstReal.h = (int)(dstRectToSend.h * scaleh);
                 dstReal.w = (int)(dstRectToSend.w * scalew);
              
-                if (srcRect != null)
+                if (srcRect.HasValue)
                 {
                     SDL.SDL_Rect srcRectToSend;
-                    // srcRect.ic();
                     srcRectToSend = (SDL.SDL_Rect)srcRect;
                     int sdlRtn = SDL.SDL_RenderCopy(renderer, texture, ref srcRectToSend, ref dstReal);
                     if (sdlRtn != 0)
@@ -64,7 +63,7 @@ namespace ag
             else
             {
 
-                if (srcRect != null)
+                if (srcRect.HasValue)
                 {
                     SDL.SDL_Rect srcRectToSend;
                     srcRectToSend = (SDL.SDL_Rect)srcRect;
