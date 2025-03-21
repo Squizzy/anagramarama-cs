@@ -8,7 +8,7 @@ namespace ag
         /// <param name="screen">The renderer to display on</param>
         /// <param name="movie">The sprite to use</param>
         /// <returns>Nothing</returns>
-        public static void ShowSprite(ref IntPtr screen, Sprite movie)
+        public static void ShowSprite(IntPtr screen, Sprite movie)
         {
             SDL.SDL_Rect rect = new()
             {
@@ -24,7 +24,7 @@ namespace ag
                 rect.y = movie.y + movie.sprite[i].sprite_y_offset;
                 rect.w = movie.sprite[i].sprite_band_dimensions.w;
                 rect.h = movie.sprite[i].sprite_band_dimensions.h;
-                SDLScale_RenderCopy(screen, movie.sprite[i].sprite_band_texture, movie.sprite[i].sprite_band_dimensions, ref rect);
+                SDLScale_RenderCopy(screen, movie.sprite[i].sprite_band_texture, movie.sprite[i].sprite_band_dimensions, rect);
             }
         }
 
@@ -58,7 +58,7 @@ namespace ag
         /// <param name="movie">The sprite to move</param>
         /// <param name="letterSpeed">The speed to move the sprite at</param>
         /// <returns>Nothing</returns>
-        public static void MoveSprite(ref IntPtr screen, Sprite movie, int letterSpeed)
+        public static void MoveSprite(IntPtr screen, Sprite movie, int letterSpeed)
         {
             int Xsteps;
 
@@ -100,19 +100,19 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void MoveSprites(ref IntPtr screen, Sprite letters, int letterSpeed)
         {
-            Sprite current;
+            Sprite? current;
 
             current = letters;
             while (current != null)
             {
-                MoveSprite(ref screen, current, letterSpeed);
+                MoveSprite(screen, current, letterSpeed);
                 current = current.next;
             }
 
             current = letters;
             while (current != null)
             {
-                ShowSprite(ref screen, current);
+                ShowSprite(screen, current);
                 current = current.next;
             }
             SDL.SDL_RenderPresent(screen);
