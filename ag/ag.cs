@@ -32,7 +32,7 @@ namespace ag
 
         // shuffle is an array that can be modified so it needs to have a field that is set and get
         /// <summary>Represents a shuffled array of characters.</summary>
-        private static readonly char[] _shuffle = new char[8];
+        private static readonly char[] _shuffle = new char[7];
 
         /// <summary>Gets or sets the shuffled array of characters.</summary>
         public static char[] Shuffle
@@ -53,7 +53,7 @@ namespace ag
 
         // answer is an array that can be modified so it needs to have a field that is set and get
         /// <summary>Represents an answer array of characters.</summary>
-        public static readonly char[] _answer = new char[8];
+        public static readonly char[] _answer = new char[7];
 
         /// <summary>Gets or sets the answer array of characters.</summary>
         public static char[] Answer
@@ -73,14 +73,14 @@ namespace ag
         }
 
         /// <value>the path to the locale language to use for the game (where the worldlist.txt is)</value>
-        public static string? language;
+        public static string language = "";
         /// <value>the path to the locale data to use for the game. Used for Gamerzilla, which is not implemented here</value>
         /// https://jimrich.sk/environment-specialfolder-on-windows-linux-and-os-x/
-        public static string? userPath;
+        public static string userPath = "";
         /// <value>the base path for the game. Used for Gamerzilla, which is not implemented here</value>
-        public static string? basePath;
+        public static string basePath = "";
         /// <summary>txt</summary>
-        public static char[] txt = new char[256];
+        public static string txt = "";
         /// <summary>rootword</summary>
         public static char[] rootword = new char[9];
         /// <summary>updateAnswers</summary>
@@ -163,10 +163,10 @@ namespace ag
         /// <remarks> Constructor</remarks>
         /// <param name="name">Name of the sound</param>
         /// <param name="audioChunk">pointer to the audio chunk</param>
-        public class Sound(string? name, IntPtr audioChunk)
+        public class Sound(string name, IntPtr audioChunk)
         {
             /// <value> Property <c>Name</c> name of the sound </value>
-            public string? Name { get; set; } = name;
+            public string Name { get; set; } = name;
             /// <value> Property <c>audio_chunk</c> audio chunk </value>
             public IntPtr Audio_chunk { get; set; } = audioChunk;
             /// <value> Property <c>Next</c> next sound </value>
@@ -174,7 +174,8 @@ namespace ag
         }
 
         /// <summary>soundCache</summary>
-        public static Sound? soundCache = new(null, IntPtr.Zero);
+        public static Sound? soundCache;
+        // public static Sound? soundCache = new(null, IntPtr.Zero);
 
 
         // SKIPPED the Error and Debug functions of the original C as this is handled differently in C#
@@ -210,21 +211,27 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void PushSound(ref Sound soundCache, string name, string filename)
         {
-            Sound? thisSound = null;
 
-            thisSound.Name = name;
+            string soundFilename = new string(basePath) + audioSubPath;
+
+            if ((soundFilename[0] != 0) && (soundFilename[soundFilename.Length - 1] != DIR_SEP))
+            // if ((soundFilename[0] != 0) && (soundFilename[soundFilename.Length] != '/'))
+            {
+                // soundFilename += '/';
+                soundFilename += DIR_SEP;
+            }
+            soundFilename += filename;
+
+            IntPtr Audio_chunk = SDL_mixer.Mix_LoadWAV(soundFilename);
+
+            Sound thisSound = new Sound(name: name, audioChunk: Audio_chunk);
+
+            // thisSound.Name = name;
             thisSound.Next = soundCache;
 
-            thisSound.Audio_chunk = IntPtr.Zero;
+            // thisSound.Audio_chunk = Audio_chunk;
 
-            string tempFileName = new string(basePath);
-            if ((tempFileName[0] != 0) && (tempFileName[tempFileName.Length] != '/'))
-            {
-                tempFileName += '/';
-            }
-            tempFileName += filename;
 
-            thisSound.Audio_chunk = SDL_mixer.Mix_LoadWAV(tempFileName);
 
             soundCache = thisSound;
         }
@@ -238,15 +245,24 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void BufferSounds(ref Sound soundCache)
         {
-            PushSound(ref soundCache, "click-answer", "audio/click-answer.wav");
-            PushSound(ref soundCache, "click-shuffle", "audio/click-shuffle.wav");
-            PushSound(ref soundCache, "foundbig", "audio/foundbig.wav");
-            PushSound(ref soundCache, "found", "audio/found.wav");
-            PushSound(ref soundCache, "clear", "audio/clearword.wav");
-            PushSound(ref soundCache, "duplicate", "audio/duplicate.wav");
-            PushSound(ref soundCache, "badword", "audio/badword.wav");
-            PushSound(ref soundCache, "shuffle", "audio/shuffle.wav");
-            PushSound(ref soundCache, "clock-tick", "audio/clock-tick.wav");
+            // PushSound(ref soundCache, "click-answer", "audio/click-answer.wav");
+            // PushSound(ref soundCache, "click-shuffle", "audio/click-shuffle.wav");
+            // PushSound(ref soundCache, "foundbig", "audio/foundbig.wav");
+            // PushSound(ref soundCache, "found", "audio/found.wav");
+            // PushSound(ref soundCache, "clear", "audio/clearword.wav");
+            // PushSound(ref soundCache, "duplicate", "audio/duplicate.wav");
+            // PushSound(ref soundCache, "badword", "audio/badword.wav");
+            // PushSound(ref soundCache, "shuffle", "audio/shuffle.wav");
+            // PushSound(ref soundCache, "clock-tick", "audio/clock-tick.wav");
+            PushSound(ref soundCache, "click-answer", "click-answer.wav");
+            PushSound(ref soundCache, "click-shuffle", "click-shuffle.wav");
+            PushSound(ref soundCache, "foundbig", "foundbig.wav");
+            PushSound(ref soundCache, "found", "found.wav");
+            PushSound(ref soundCache, "clear", "clearword.wav");
+            PushSound(ref soundCache, "duplicate", "duplicate.wav");
+            PushSound(ref soundCache, "badword", "badword.wav");
+            PushSound(ref soundCache, "shuffle", "shuffle.wav");
+            PushSound(ref soundCache, "clock-tick", "clock-tick.wav");
         }
 
 
@@ -270,7 +286,9 @@ namespace ag
         }
 
 
-        /// <summary> load the named image to position x,y onto the required surface </summary>
+        /// <summary> load the named image to position x,y onto the required surface 
+        // NOTE: Unused functionality
+        // </summary>
         /// <param name="file">the filename to load (.BMP)</param>
         /// <param name="screen">the SDL_Surface to display the image</param>
         /// <returns>Nothing</returns>
@@ -285,14 +303,16 @@ namespace ag
             if (imageSurf == IntPtr.Zero)
             {
                 Console.WriteLine("Couldn't load %s: %s\n", file, SDL.SDL_GetError());
+                return;
             }
             dest.x = 0;
             dest.y = 0;
             dest.w = 800;
             dest.h = 600;
             image = SDL.SDL_CreateTextureFromSurface(screen, imageSurf);
-            SDLScale_RenderCopy(screen, image, null, ref dest);
+            SDLScale_RenderCopy(screen, image, null, dest);
 
+            // Update the changed portion of the screen
             SDL.SDL_FreeSurface(imageSurf);
             SDL.SDL_DestroyTexture(image);
         }
@@ -357,11 +377,11 @@ namespace ag
                     numLetters++;
                     if (current.guessed)
                     {
-                        SDLScale_RenderCopy(screen, answerBoxKnown, null, ref outerRect);
+                        SDLScale_RenderCopy(screen, answerBoxKnown, null, outerRect);
                     }
                     else
                     {
-                        SDLScale_RenderCopy(screen, answerBoxUnknown, null, ref outerRect);
+                        SDLScale_RenderCopy(screen, answerBoxUnknown, null, outerRect);
                     }
 
                     innerRect.w = outerRect.w - 1;
@@ -377,7 +397,7 @@ namespace ag
                         letterBankRect.x = 10 * c;
                         innerRect.w = letterBankRect.w;
                         innerRect.h = letterBankRect.h;
-                        SDLScale_RenderCopy(screen, smallLetterBank, letterBankRect, ref innerRect);
+                        SDLScale_RenderCopy(screen, smallLetterBank, letterBankRect, innerRect);
                     }
                     outerRect.x += 18;
                 }
@@ -593,6 +613,13 @@ namespace ag
                 }
                 fullscreen = !fullscreen;
             }
+
+            else if (keyedLetter == SDL.SDL_Keycode.SDLK_F2)
+            {
+                // Start new game
+                startNewGame = true;
+            }
+
             else if (!gamePaused)
             {
                 switch (keyedLetter)
@@ -605,6 +632,10 @@ namespace ag
                     case SDL.SDL_Keycode.SDLK_BACKSPACE:
                         while (current != null && current.box != CONTROLS)
                         {
+                            if (current.box == ANSWER && current.index > maxIndex)
+                            {
+                                maxIndex = current.index;
+                            }
                             current = current.next;
                         }
 
@@ -670,7 +701,8 @@ namespace ag
         /// <returns>true if clicked inside the box, false otherwise</returns>
         public static bool IsInside(Box box, int x, int y)
         {
-            return (x > box.x) && (x < (box.x - box.width)) && (y > box.y) && (y < (box.y = box.height));
+            Console.WriteLine($"x {x} - {(x > box.x) && (x < (box.x + box.width))} - [ x {box.x} | x + w {box.x + box.width}] - y {y} - {(y > box.y) && (y < (box.y + box.height))} - [y {box.y} | y + h {box.y + box.height}");
+            return (x > box.x) && (x < (box.x + box.width)) && (y > box.y) && (y < (box.y + box.height));
         }
 
 
@@ -837,6 +869,8 @@ namespace ag
 
             string buffer = totalScore.ToString();
 
+            scoreSprite = new Sprite(buffer.Length);
+
             for (int i = 0; i < buffer.Length; i++)
             {
                 fromRect.x = SCORE_WIDTH * ((int)buffer[i] - 48);
@@ -868,14 +902,25 @@ namespace ag
             int secondsTens = seconds / 10;
             int secondsUnits = seconds % 10;
 
+            clockSprite = new Sprite(5);
             fromRect.x = CLOCK_WIDTH * minutesTens;
             clockSprite.sprite[0].sprite_band_dimensions = fromRect;
             fromRect.x = CLOCK_WIDTH * minutesUnits;
             clockSprite.sprite[1].sprite_band_dimensions = fromRect;
             fromRect.x = CLOCK_WIDTH * secondsTens;
-            clockSprite.sprite[3].sprite_band_dimensions = fromRect;
+            clockSprite.sprite[2].sprite_band_dimensions = fromRect;
             fromRect.x = CLOCK_WIDTH * secondsUnits;
-            clockSprite.sprite[4].sprite_band_dimensions = fromRect;
+            clockSprite.sprite[3].sprite_band_dimensions = fromRect;
+
+            // tick out the last 10 seconds
+            if (thisTime <= 10 && thisTime > 0)
+            {
+                if (audio_enabled)
+                {
+                    SDL_mixer.Mix_PlayChannel(-1, GetSound("clock-tick"), 0);
+                }
+            }
+
         }
 
 
@@ -999,7 +1044,10 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void BuildLetters(ref Sprite letters, IntPtr screen)
         {
-            Sprite? thisLetter = null, previousLetter = null;
+
+            // Sprite? thisLetter = null, previousLetter = null;
+            Sprite thisLetter;
+            Sprite previousLetter;
 
             SDL.SDL_Rect rect;
             int index = 0;
@@ -1010,7 +1058,10 @@ namespace ag
             rect.w = GAME_LETTER_WIDTH;
             rect.h = GAME_LETTER_HEIGHT;
 
+
             int len = Shuffle.Length;
+            thisLetter = new Sprite(len);
+            previousLetter = new Sprite(len);
 
             for (int i = 0; i < len; i++)
             {
@@ -1022,14 +1073,14 @@ namespace ag
                     rect.x = chr * GAME_LETTER_WIDTH;
                     thisLetter.numSpr = 1;
 
-                    thisLetter.sprite[0].sprite_band_texture = letterBank;
-                    thisLetter.sprite[0].sprite_band_dimensions = rect;
-                    thisLetter.sprite[0].sprite_x_offset = 0;
-                    thisLetter.sprite[0].sprite_y_offset = 0;
+                    thisLetter.sprite[i].sprite_band_texture = letterBank;
+                    thisLetter.sprite[i].sprite_band_dimensions = rect;
+                    thisLetter.sprite[i].sprite_x_offset = 0;
+                    thisLetter.sprite[i].sprite_y_offset = 0;
 
-                    thisLetter.x = random.Next(800);/*i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X;*/
-                    thisLetter.y = random.Next(600); /* SHUFFLE_BOX_Y; */
                     thisLetter.letter = Shuffle[i];
+                    thisLetter.x = random.Next(800); // this is to make the letter fly in from wherever on the screen to toX location
+                    thisLetter.y = random.Next(600); // this is to make the letter fly in from wherever on the screen to toY location
                     thisLetter.h = GAME_LETTER_HEIGHT;
                     thisLetter.w = GAME_LETTER_WIDTH;
                     thisLetter.toX = i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X;
@@ -1042,7 +1093,7 @@ namespace ag
 
                     letters = thisLetter;
 
-                    thisLetter = null;
+                    thisLetter = new Sprite(len);  // not needed as we have a constructor
                 }
                 else
                 {
@@ -1063,8 +1114,8 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void AddClock(ref Sprite letters, IntPtr screen)
         {
-            Sprite? thisLetter = new Sprite(5);
-            Sprite? previousLetter = null;
+            Sprite thisLetter;
+            Sprite previousLetter;
             Sprite? current = letters;
             int index = 0;
 
@@ -1074,12 +1125,19 @@ namespace ag
             fromRect.w = CLOCK_WIDTH;
             fromRect.h = CLOCK_HEIGHT;
 
-            while (current != null)
+            int lettercount = 0;
+
+
+            while (current.next != null)
             {
+                lettercount++;
+                Console.WriteLine($"letter {lettercount}: {current.letter}");
                 previousLetter = current;
                 current = current.next;
             }
 
+            thisLetter = new Sprite(5); // 5 characters in the clock
+            previousLetter = new Sprite(5);
             thisLetter.numSpr = 5;
 
             // initialise with 05:00
@@ -1139,8 +1197,8 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void AddScore(ref Sprite letters, IntPtr screen)
         {
-            Sprite? thisLetter = new Sprite(5);
-            Sprite? previousLetter = null;
+            Sprite thisLetter;
+            Sprite previousLetter;
             Sprite? current = letters;
 
             SDL.SDL_Rect fromRect;   // dimensions of the numbers band image in px
@@ -1162,6 +1220,9 @@ namespace ag
                 previousLetter = current;
                 current = current.next;
             }
+
+            thisLetter = new Sprite(5); // 5 characters in the score
+            previousLetter = new Sprite(5);
 
             // pre-loading: "    0"
             for (int i = 0; i < 5; i++)
@@ -1212,8 +1273,11 @@ namespace ag
         public static void NewGame(ref Node headNode, Dlb_node dlbHeadNode, IntPtr screen, ref Sprite letters)
         {
             // letters in the guess box
-            char[] guess = new char[9];
-            char[] remain = new char[9];
+            // char[] guess = new char[7];
+            // char[] remain = new char[7];
+            string guess = "";
+            string remain = "";
+            
             // happy is true if we have < 67 anagrams and => 6
             bool happy = false;
 
@@ -1225,7 +1289,7 @@ namespace ag
             dest.y = 0;
             dest.w = 800;
             dest.h = 600;
-            SDLScale_RenderCopy(screen, backgroundTex, null, ref dest);
+            SDLScale_RenderCopy(screen, backgroundTex, null, dest);
 
             DestroyLetters(ref letters);
 
@@ -1246,17 +1310,21 @@ namespace ag
 
             while (!happy)
             {
-                char[] buffer = new char[9];
-                string bufferString = new string(buffer);
-                GetRandomWord(ref bufferString, buffer.Length);
+                // char[] buffer = new char[9];
+                // string bufferString = new string(buffer);
+                string bufferString ="";
+                // changed this max size from original game
+                GetRandomWord(ref bufferString, MAX_ANAGRAM_LENGTH);
                 rootword = bufferString.ToCharArray();
                 bigWordLen = rootword.Length;
-                remain = rootword;
+                remain = new string(rootword);
 
-                DestroyAnswers(headNode);
+                DestroyAnswers(ref headNode);
 
-                string guessString = new string(guess);
-                string remainString = new string(remain);
+                string guessString = guess;
+                string remainString = remain;
+                // string guessString = new string(guess);
+                // string remainString = new string(remain);
                 Ag(ref headNode, dlbHeadNode, guessString, remainString);
 
 
@@ -1271,12 +1339,14 @@ namespace ag
 
             for (int i = bigWordLen; i < 7; i++)
             {
-                remain[i] = SPACE_CHAR;
+                // remain[i] = SPACE_CHAR;
+                remain = remain[0..(i - 1)] + SPACE_CHAR + remain[(i + 1)..remain.Length];
             }
-            remain[7] = '0';  // might be superfluous with C#
-            remain[bigWordLen] = '\0'; // might be superfluous with C#
-            ShuffleWord(ref remain);
-            Shuffle = remain;
+            // remain[7] = '0';  // might be superfluous with C#
+            // remain[bigWordLen] = '\0'; // might be superfluous with C#
+            char[] remainToShuffle = remain.ToCharArray();
+            ShuffleWord(ref remainToShuffle);
+            Shuffle = remainToShuffle;
 
             Answer = SPACE_FILLED_CHARS.ToCharArray();
 
@@ -1355,7 +1425,6 @@ namespace ag
         }
 
 
-
         /// <summary> Callback method for SDL timer events
         /// Attempt at rewrite of the timer callback from the original C
         /// </summary>
@@ -1416,8 +1485,8 @@ namespace ag
         {
             bool done = false;
             SDL.SDL_Event sdlEvent;
-            int timeNow;
-            // TimeSpan timeNow;
+            // int timeNow;
+            TimeSpan timeNow;
 
             SDL.SDL_Init(SDL.SDL_INIT_TIMER);
             uint timer_delay = 20;
@@ -1428,12 +1497,119 @@ namespace ag
             dest.y = 0;
             dest.w = 800;
             dest.h = 600;
+                    SDL.SDL_RenderPresent(screen);
 
             while (!done)
             {
-                SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
-                SDL.SDL_RenderClear(screen);
-                SDLScale_RenderCopy(screen, backgroundTex, null, ref dest);
+                while (SDL.SDL_PollEvent(out sdlEvent) != 0)  // need to use int as return is not a bool
+                {
+
+                    switch (sdlEvent.type)
+                    {
+                        // case SDL.SDL_EventType.SDL_USEREVENT:
+                        //     Console.WriteLine("HANDLING USEREVENT");
+                        //     timer_delay = (uint)(AnySpriteMoving(letters) ? 10 : 100);
+                        //     // SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
+                        //     // SDL.SDL_RenderClear(screen);
+                        //     // SDLScale_RenderCopy(screen, backgroundTex, null, dest);
+                        //     // DisplayAnswerBoxes(headNode, screen);
+                        //     // MoveSprite(screen, letters, letterSpeed);
+                        //     timer = SDL.SDL_AddTimer(timer_delay, TimerCallBack, IntPtr.Zero);
+                        //     break;
+
+                        case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
+                            Console.WriteLine("HANDLING MOUSE EVENT");
+                            Console.WriteLine($"Before {sdlEvent.button.x} - {sdlEvent.button.y}");
+                            SDLScale_MouseEvent(ref sdlEvent);
+                            Console.WriteLine($"After {sdlEvent.button.x} - {sdlEvent.button.y}");
+                            ClickDetect(sdlEvent.button.button, sdlEvent.button.x, sdlEvent.button.y, screen, headNode, letters);
+                            break;
+
+                        case SDL.SDL_EventType.SDL_KEYUP:
+                            Console.WriteLine("HANDLING KEYUP");
+                            HandleKeyboardEvent(sdlEvent, headNode, letters);
+                            break;
+
+                        case SDL.SDL_EventType.SDL_QUIT:
+                            Console.WriteLine("HANDLING QUIT");
+                            // done = true;
+                            quitGame = true;
+                            break;
+
+                        case SDL.SDL_EventType.SDL_WINDOWEVENT:
+                            Console.WriteLine("HANDLING WINDOWEVENT");
+                            if ((sdlEvent.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED) ||
+                                    (sdlEvent.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_SIZE_CHANGED))
+                            {
+                                double scalew = sdlEvent.window.data1 / 800.0;
+                                double scaleh = sdlEvent.window.data2 / 600.0;
+                                SDLScaleSet(scalew, scaleh);
+                            }
+                            break;
+
+                    }
+                    // if (sdlEvent.type == SDL.SDL_EventType.SDL_USEREVENT)
+                    //         {
+                    //             timer_delay = (uint)(AnySpriteMoving(letters) ? 10 : 100);
+                    //             // SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
+                    //             // SDL.SDL_RenderClear(screen);
+                    //             // SDLScale_RenderCopy(screen, backgroundTex, null, dest);
+                    //             // DisplayAnswerBoxes(headNode, screen);
+                    //             // MoveSprite(screen, letters, letterSpeed);
+                    //             timer = SDL.SDL_AddTimer(timer_delay, TimerCallBack, IntPtr.Zero);
+                    //             break;
+                    //         }
+
+                    //         else if (sdlEvent.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN)
+                    //         {
+                    //             SDLScale_MouseEvent(ref sdlEvent);
+                    //         }
+
+                    //         else if (sdlEvent.type == SDL.SDL_EventType.SDL_KEYUP)
+                    //         {
+                    //             HandleKeyboardEvent(sdlEvent, headNode, letters);
+                    //         }
+
+                    //         else if (sdlEvent.type == SDL.SDL_EventType.SDL_QUIT)
+                    //         {
+                    //             done = true;
+                    //             break;
+                    //         }
+
+                    //         else if (sdlEvent.type == SDL.SDL_EventType.SDL_WINDOWEVENT)
+                    //         {
+                    //             if ((sdlEvent.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED) ||
+                    //                     (sdlEvent.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_SIZE_CHANGED))
+                    //             {
+                    //                 double scalew = sdlEvent.window.data1 / 800.0;
+                    //                 double scaleh = sdlEvent.window.data2 / 600.0;
+                    //                 SDLScaleSet(scalew, scaleh);
+                    //             }
+                    //         }
+
+                    // SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
+                    // SDL.SDL_RenderClear(screen);
+                    // SDLScale_RenderCopy(screen, backgroundTex, null, dest);
+                    // DisplayAnswerBoxes(headNode, screen);
+                    // MoveSprite(screen, letters, letterSpeed);
+                }
+
+                // int sdlRtn = SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
+                // if (sdlRtn != 0)
+                // {
+                //     Console.Write("Error with SDL_SetRenderDrawColor");
+                //     Console.ReadLine();
+                // }
+                // sdlRtn  = SDL.SDL_RenderClear(screen);
+                // if (sdlRtn != 0)
+                // {
+                //     Console.Write("Error with SDL_RenderClear");
+                //     Console.ReadLine();
+                // }
+                // SDLScale_RenderCopy(screen, backgroundTex, null, dest);
+
+
+                // Console.WriteLine("OUTSIDE EVENT LOOP");
 
                 if (winGame)
                 {
@@ -1443,134 +1619,104 @@ namespace ag
 
                 if ((gameTime < AVAILABLE_TIME) && !stopTheClock)
                 {
-                    timeNow = (DateTime.Now - gameStart).Seconds;
-                    if (timeNow != gameTime)
+                    timeNow = DateTime.Now - gameStart;
+                    // Console.WriteLine($"{gameStart} - {timeNow.Seconds} - {gameTime}");
+                    if (timeNow.Seconds != gameTime)
                     {
-                        gameTime = timeNow;
+                        gameTime = timeNow.Seconds;
                         UpdateTime(screen);
                     }
-                    else
+                }
+                else
+                {
+                    if (!stopTheClock)
                     {
-                        if (!stopTheClock)
-                        {
-                            stopTheClock = true;
-                            solvePuzzle = true;
-                        }
-                    }
-
-                    // Check messages
-                    if (solvePuzzle)
-                    {
-                        // Walk the list, setting everything to found
-                        SolveIt(headNode);
-                        ClearWord(letters);
-                        Shuffle = SPACE_FILLED_STRING.ToCharArray();
-                        Answer = rootword;
-                        gamePaused = true;
-                        if (!stopTheClock)
-                        {
-                            stopTheClock = true;
-                        }
-                        solvePuzzle = false;
-                    }
-
-                    if (updateAnswers)
-                    {
-                        // move letters back down again
-                        ClearWord(letters);
-                        updateAnswers = false;
-                    }
-                    DisplayAnswerBoxes(headNode, screen);
-
-                    if (startNewGame)
-                    {
-                        // move letters back down again
-                        if (!gotBigWord)
-                        {
-                            totalScore = 0;
-                        }
-                        NewGame(ref headNode, dldHeadNode, screen, ref letters);
-
-                        startNewGame = false;
-                    }
-
-                    if (shuffleRemaining)
-                    {
-                        // shuffle up the shuffle box
-                        string shuffler;
-                        shuffler = new string(Shuffle);
-                        ShuffleAvailableLetters(ref shuffler, ref letters);
-                        Shuffle = shuffler.ToCharArray();
-                        shuffleRemaining = false;
-                    }
-
-                    if (clearGuess)
-                    {
-                        // clear the guess
-                        if (ClearWord(letters) > 0)
-                        {
-                            if (audio_enabled)
-                            {
-                                SDL_mixer.Mix_PlayChannel(-1, GetSound("clear"), 0);
-                            }
-                            clearGuess = false;
-                        }
-                    }
-
-                    if (quitGame)
-                    {
-                        done = true;
-                    }
-
-                    while (SDL.SDL_WaitEvent(out sdlEvent) != 0)  // need to use int as return is not a bool
-                    {
-                        if (sdlEvent.type == SDL.SDL_EventType.SDL_USEREVENT)
-                        {
-                            timer_delay = (uint)(AnySpriteMoving(letters) ? 10 : 100);
-                            SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
-                            SDL.SDL_RenderClear(screen);
-                            SDLScale_RenderCopy(screen, backgroundTex, null, ref dest);
-                            DisplayAnswerBoxes(headNode, screen);
-                            MoveSprites(ref screen, letters, letterSpeed);
-                            timer = SDL.SDL_AddTimer(timer_delay, TimerCallBack, IntPtr.Zero);
-                            break;
-                        }
-
-                        else if (sdlEvent.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN)
-                        {
-                            SDLScale_MouseEvent(ref sdlEvent);
-                        }
-
-                        else if (sdlEvent.type == SDL.SDL_EventType.SDL_KEYUP)
-                        {
-                            HandleKeyboardEvent(sdlEvent, headNode, letters);
-                        }
-
-                        else if (sdlEvent.type == SDL.SDL_EventType.SDL_QUIT)
-                        {
-                            done = true;
-                            break;
-                        }
-
-                        else if (sdlEvent.type == SDL.SDL_EventType.SDL_WINDOWEVENT)
-                        {
-                            if ((sdlEvent.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED) ||
-                                    (sdlEvent.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_SIZE_CHANGED))
-                            {
-                                double scalew = sdlEvent.window.data1 / 800.0;
-                                double scaleh = sdlEvent.window.data2 / 600.0;
-                                SDLScaleSet(scalew, scaleh);
-                            }
-                        }
-                        SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
-                        SDL.SDL_RenderClear(screen);
-                        SDLScale_RenderCopy(screen, backgroundTex, null, ref dest);
-                        DisplayAnswerBoxes(headNode, screen);
-                        MoveSprites(ref screen, letters, letterSpeed);
+                        stopTheClock = true;
+                        solvePuzzle = true;
                     }
                 }
-            }
+                
 
+                // Check messages
+                if (solvePuzzle)
+                {
+                    // Walk the list, setting everything to found
+                    SolveIt(headNode);
+                    ClearWord(letters);
+                    Shuffle = SPACE_FILLED_STRING.ToCharArray();
+                    Answer = rootword;
+                    gamePaused = true;
+                    if (!stopTheClock)
+                    {
+                        stopTheClock = true;
+                    }
+                    solvePuzzle = false;
+                }
+
+                if (updateAnswers)
+                {
+                    // move letters back down again
+                    ClearWord(letters);
+                    updateAnswers = false;
+                }
+                DisplayAnswerBoxes(headNode, screen);
+
+                if (startNewGame)
+                {
+                    Console.WriteLine("STARTING GAME");
+                    // move letters back down again
+                    if (!gotBigWord)
+                    {
+                        totalScore = 0;
+                    }
+                    NewGame(ref headNode, dldHeadNode, screen, ref letters);
+
+                    startNewGame = false;
+                }
+
+                if (shuffleRemaining)
+                {
+                    // shuffle up the shuffle box
+                    string shuffler;
+                    shuffler = new string(Shuffle);
+                    ShuffleAvailableLetters(ref shuffler, ref letters);
+                    Shuffle = shuffler.ToCharArray();
+                    shuffleRemaining = false;
+                }
+
+                if (clearGuess)
+                {
+                    // clear the guess
+                    if (ClearWord(letters) > 0)
+                    {
+                        if (audio_enabled)
+                        {
+                            SDL_mixer.Mix_PlayChannel(-1, GetSound("clear"), 0);
+                        }
+                        clearGuess = false;
+                    }
+                }
+
+                if (quitGame)
+                {
+                    Console.WriteLine("HANDLING quitGame");
+                    done = true;
+                }
+
+                // Present the renderer
+
+                SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
+                SDL.SDL_RenderClear(screen);
+                SDLScale_RenderCopy(screen, backgroundTex, null, dest);
+                DisplayAnswerBoxes(headNode, screen);
+                MoveSprite(screen, letters, letterSpeed);
+
+                SDL.SDL_RenderPresent(screen);
+                
+                // Add a small delay to prevent CPU overuse
+                SDL.SDL_Delay(16); // roughly 60 FPS
+
+            }
         }
 
 
@@ -1580,9 +1726,11 @@ namespace ag
         public static bool IsValidLocale(string path)
         {
             string filePath = path;
-            if (filePath.ToCharArray()[filePath.Length] != '/')
+            // if (filePath[filePath.Length - 1] != '/')
+            if (filePath[filePath.Length - 1] != DIR_SEP)
             {
-                filePath += '/';
+                filePath += DIR_SEP;
+                // filePath += '/';
             }
             filePath += "wordlist.txt";
 
@@ -1625,24 +1773,29 @@ namespace ag
             return (false, null, null);
         }
 
+
         /// <summary> read any locale-specific configuration information from an ini file. 
         /// This can reconfigure the positions of the boxes to account for different word sizes 
         /// or alternative background layouts
         /// </summary>
-        /// <param name="path"></param>
-        public static void LoadConfig(string path)
+        /// <param name="configFile"></param>
+        public static void LoadConfig(string configFile)
         {
-            using StreamReader sr = new StreamReader(path);
-            string? line = sr.ReadLine();
-            while (line != null)
+            if (File.Exists(configFile))
             {
-                (bool isConfigBox, int? boxIndex, Box? boxDimensions) = ConfigBox(line);
-                if (isConfigBox && boxIndex != null && boxDimensions != null)
+                using StreamReader sr = new StreamReader(configFile);
+                string? line = sr.ReadLine();
+                while (line != null)
                 {
-                    hotbox[(int)boxIndex] = (Box)boxDimensions;
+                    (bool isConfigBox, int? boxIndex, Box? boxDimensions) = ConfigBox(line);
+                    if (isConfigBox && boxIndex != null && boxDimensions != null)
+                    {
+                        hotbox[(int)boxIndex] = (Box)boxDimensions;
+                    }
                 }
             }
         }
+
 
         /// <summary>Get the current language string from the environment. 
         ///  This is used to location the wordlist and other localized resources.
@@ -1656,35 +1809,49 @@ namespace ag
             // prefix is the local folder where the language specifics are stored (ie in addition to "i18n/")
             CultureInfo currentCulture = CultureInfo.CurrentCulture;
             string culture = currentCulture.Name; // eg en-GB
+            localePath = culture + DIR_SEP;
 
             language = prefix;
-            if ((language[0] != 0) && (language[language.Length] != '/'))
-            {
-                // TODO: check if this is the most portable way to do this
-                language += '/';
-            }
-            language += "i18n/" + culture;
+            // if (language.Length == 0)
+            // {
+            //     // language += "./";
+            //     language += "." + DIR_SEP;
+            // }
+            // // if ((language[0] != 0) && (language[language.Length - 1] != '/'))
+            // if ((language[0] != 0) && (language[language.Length - 1] != DIR_SEP))
+            // {
+            //     // TODO: check if this is the most portable way to do this
+            //     // language += '/';
+            //     language += DIR_SEP;
+            // }
+            // // language += "i18n/" + culture;
+
+            language += basePath + "i18n" + DIR_SEP + culture;
             if (IsValidLocale(language))
             {
                 return true;
             }
 
-            int lastIndexOfDot = language.LastIndexOf('.');
+            int lastIndexOfDot = culture.LastIndexOf('.');
             if (lastIndexOfDot != -1)
             {
-                language = language[..lastIndexOfDot];
+                culture = culture[..lastIndexOfDot];
+                language += basePath + "i18n" + DIR_SEP + culture;
                 if (IsValidLocale(language))
                 {
+                    localePath = culture + DIR_SEP;
                     return true;
                 }
             }
 
-            int lastIndexOfUnderscore = language.LastIndexOf('_');
+            int lastIndexOfUnderscore = culture.LastIndexOf('_');
             if (lastIndexOfUnderscore != -1)
             {
-                language = language[..lastIndexOfUnderscore];
+                culture = culture[..lastIndexOfUnderscore];
+                language += basePath + "i18n" + DIR_SEP + culture;
                 if (IsValidLocale(language))
                 {
+                    localePath = culture + DIR_SEP;
                     return true;
                 }
             }
@@ -1693,10 +1860,12 @@ namespace ag
 
             // last resort: use the default locale
             language = prefix;
-            if ((language[0] != 0) && (language[language.Length] != '/'))
+            if ((language[0] != 0) && (language[language.Length - 1] != DIR_SEP))
+            // if ((language[0] != 0) && (language[language.Length - 1] != '/'))
             {
                 // TODO: check if this is the most portable way to do this
-                language += '/';
+                // language += '/';
+                language += DIR_SEP;
             }
             language += DEFAULT_LOCALE_PATH;
 
@@ -1713,11 +1882,16 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void InitLocale(string[] args)
         {
-            language = "i18n/";
+            // language = ;
 
-            if (args[1] != null)
+            // language = "i18n/";
+            // language += "i18n" + DIR_SEP;
+
+            if (args.Length > 1)
             {
-                language += args[1];
+                localePath = args[1].Trim();
+                // TODO: remove any trailing or leading directory separators and mode more checks in general
+                language += basePath + "i18n" + DIR_SEP + localePath + DIR_SEP;
                 if (IsValidLocale(language))
                 {
                     return;
@@ -1736,19 +1910,181 @@ namespace ag
             string? env = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             if (env == null)
             {
-                env = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.local/share/";
+                env = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + DIR_SEP + ".local" + DIR_SEP + "share" + DIR_SEP;
             }
 
-            userPath = env + "/anagramarama/";
+            userPath = env + env + DIR_SEP + "anagramarama" + DIR_SEP;
         }
 
 
-        /// <summary> not used. Used for Gamerzilla, which is not implemented here</summary>
+        /// <summary> not used.</summary>
         /// <returns>Nothing</returns>
         public static void GetBasePath()
         {
-            basePath = "./";
-        } 
+            string? env = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            if (env == null)
+            {
+                // env = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.local/share/";
+                env = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + DIR_SEP + ".local" + DIR_SEP + "share" + DIR_SEP;
+            }
 
+            basePath = env + DIR_SEP + "anagramarama" + DIR_SEP;
+            // basePath = "./";
+        }
+
+
+        /// <summary>The application entry point </summary>
+        /// <param name="args">The command line arguments, uf ysed</param>
+        /// <returns>0 if exited normally, 1 if exited with an error</returns>
+        public static int Main(string[] args)
+        {
+            Node? headNode = null;
+            Dlb_node? dlbHeadNode = null;
+            Sprite? letters = null;
+
+            int audio_rate = SDL_mixer.MIX_DEFAULT_FREQUENCY;
+            ushort audio_format = SDL.AUDIO_S16;
+            int audio_channels = 1;
+            int audio_buffers = 256;
+
+            Random random = new Random();
+
+            GetBasePath();
+
+            InitLocale(args);
+
+            // if (language[language.Length - 1] != '/')
+            if (language[language.Length - 1] != DIR_SEP)
+            {
+                // language += '/';
+                language += DIR_SEP;
+            }
+            txt = language;
+            string wordlist = txt + "wordlist.txt";
+
+            if (!DlbCreate(ref dlbHeadNode, wordlist))
+            {
+                Console.WriteLine("error leading the dictionary");
+                return 1;
+                // Environment.Exit(1);
+            }
+
+            if (SDL.SDL_Init(SDL.SDL_INIT_AUDIO | SDL.SDL_INIT_VIDEO | SDL.SDL_INIT_TIMER) < 0)
+            {
+                Console.WriteLine("Unable to unit SDL: %s", SDL.SDL_GetError());
+                return 1;
+            }
+
+            // Ignoring converting atexit for now
+
+            window = SDL.SDL_CreateWindow("Anagramarama", SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
+            if (window == IntPtr.Zero)
+            {
+                Console.WriteLine("Unable to set 800x600 video: %s", SDL.SDL_GetError());
+                return 1;
+            }
+            IntPtr renderer = SDL.SDL_CreateRenderer(window, -1, 0);
+            if (renderer == IntPtr.Zero)
+            {
+                Console.WriteLine("Rendered creating problem");
+                Console.ReadLine();
+            }
+            SDL.SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL.SDL_RenderClear(renderer);
+            SDL.SDL_RenderPresent(renderer);
+
+            if (SDL_mixer.Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) == -1)
+            {
+                Console.WriteLine("Unable to set audio: %s", SDL.SDL_GetError());
+                audio_enabled = false;
+            }
+            else
+            {
+                BufferSounds(ref soundCache);
+            }
+
+            /* cache in-game graphics */
+            string imagesPath = basePath + i18nPath + localePath + imagesSubPath;
+
+            // Console.WriteLine($"background file: {imagesPath + "background.png"}");
+            if (!File.Exists(imagesPath + "background.png"))
+            {
+                Console.WriteLine("problem with background file");
+                Console.ReadLine();
+            }
+            else
+            {
+                Console.WriteLine("Background ok");
+            }
+            IntPtr backgroundSurf = SDL_image.IMG_Load(imagesPath + "background.png");
+            backgroundTex = SDL.SDL_CreateTextureFromSurface(renderer, backgroundSurf);
+            SDL.SDL_FreeSurface(backgroundSurf);
+
+
+            if (!File.Exists(imagesPath + "letterBank.png"))
+            {
+                Console.WriteLine("problem with letterBank file");
+                Console.ReadLine();
+            }
+                        else
+            {
+                Console.WriteLine("letterBank ok");
+            }
+            IntPtr letterSurf = SDL_image.IMG_Load(imagesPath + "letterBank.png");
+            letterBank = SDL.SDL_CreateTextureFromSurface(renderer, letterSurf);
+            SDL.SDL_FreeSurface(letterSurf);
+
+            if (!File.Exists(imagesPath + "smallLetterBank.png"))
+            {
+                Console.WriteLine("problem with smallLetterBank file");
+                Console.ReadLine();
+            }
+            else
+            {
+                Console.WriteLine("smallLetterBank ok");
+            }
+            IntPtr smallLetterSurf = SDL_image.IMG_Load(imagesPath + "smallLetterBank.png");
+            smallLetterBank = SDL.SDL_CreateTextureFromSurface(renderer, smallLetterSurf);
+            SDL.SDL_FreeSurface(smallLetterSurf);
+
+            if (!File.Exists(imagesPath + "numberBank.png"))
+            {
+                Console.WriteLine("problem with numberBank file");
+                Console.ReadLine();
+            }
+            else
+            {
+                Console.WriteLine("numberBank ok");
+            }
+            IntPtr numberSurf = SDL_image.IMG_Load(imagesPath + "numberBank.png");
+            numberBank = SDL.SDL_CreateTextureFromSurface(renderer, numberSurf);
+            SDL.SDL_FreeSurface(numberSurf);
+
+            string configFilePath = basePath + i18nPath + localePath;
+            LoadConfig(configFilePath + "config.ini");
+
+            NewGame(ref headNode, dlbHeadNode, renderer, ref letters);
+
+            GameLoop(ref headNode, dlbHeadNode, renderer, ref letters);
+
+            /* tidy up and exit */
+            if (audio_enabled)
+            {
+                SDL_mixer.Mix_CloseAudio();
+                ClearSoundBuffer();
+            }
+            DlbFree(ref dlbHeadNode);
+            DestroyLetters(ref letters);
+            DestroyAnswers(ref headNode);
+            SDL.SDL_DestroyTexture(letterBank);
+            SDL.SDL_DestroyTexture(smallLetterBank);
+            SDL.SDL_DestroyTexture(numberBank);
+            SDL.SDL_DestroyTexture(backgroundTex);
+            SDL.SDL_DestroyRenderer(renderer);
+            SDL.SDL_DestroyWindow(window);
+
+            return 0;
+
+        }
     }
 }
