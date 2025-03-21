@@ -1,4 +1,5 @@
 using System.Reflection.Metadata;
+using icecream;
 using SDL2;
 
 namespace ag
@@ -13,8 +14,8 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void SDLScale_MouseEvent(ref SDL.SDL_Event mouseEvent)
         {
-            mouseEvent.button.x = mouseEvent.button.x / (int)scalew;
-            mouseEvent.button.y = mouseEvent.button.y / (int)scaleh;
+            mouseEvent.button.x = (int)(mouseEvent.button.x / scalew);
+            mouseEvent.button.y = (int)(mouseEvent.button.y / scaleh);
         }
 
 
@@ -27,7 +28,7 @@ namespace ag
         public static void SDLScale_RenderCopy(IntPtr renderer, IntPtr texture, SDL.SDL_Rect? srcRect, SDL.SDL_Rect? dstRect)
         {
 
-            if (dstRect.HasValue)
+            if (dstRect != null)
             {
                 SDL.SDL_Rect dstReal;
                 SDL.SDL_Rect dstRectToSend = (SDL.SDL_Rect)dstRect;
@@ -36,24 +37,25 @@ namespace ag
                 dstReal.y = (int)(dstRectToSend.y * scaleh);
                 dstReal.h = (int)(dstRectToSend.h * scaleh);
                 dstReal.w = (int)(dstRectToSend.w * scalew);
-
-                if (srcRect.HasValue)
+             
+                if (srcRect != null)
                 {
                     SDL.SDL_Rect srcRectToSend;
+                    // srcRect.ic();
                     srcRectToSend = (SDL.SDL_Rect)srcRect;
-                    int sdlRtn  = SDL.SDL_RenderCopy(renderer, texture, ref srcRectToSend, ref dstReal);
+                    int sdlRtn = SDL.SDL_RenderCopy(renderer, texture, ref srcRectToSend, ref dstReal);
                     if (sdlRtn != 0)
                     {
-                        Console.WriteLine("Problem with RenderCopy in SDLScale_RenderCopy");
+                        Console.WriteLine("Problem with RenderCopy in SDLScale_RenderCopy 1");
                         Console.ReadLine();
                     }
                 }
                 else
                 {
-                    int sdlRtn  = SDL.SDL_RenderCopy(renderer, texture, (nint)null, ref dstReal);
+                    int sdlRtn = SDL.SDL_RenderCopy(renderer, texture, (nint)null, ref dstReal);
                     if (sdlRtn != 0)
                     {
-                        Console.WriteLine("Problem with RenderCopy in SDLScale_RenderCopy");
+                        Console.WriteLine("Problem with RenderCopy in SDLScale_RenderCopy 2 ");
                         Console.ReadLine();
                     }
                 }
@@ -62,14 +64,14 @@ namespace ag
             else
             {
 
-                if (srcRect.HasValue)
+                if (srcRect != null)
                 {
                     SDL.SDL_Rect srcRectToSend;
                     srcRectToSend = (SDL.SDL_Rect)srcRect;
                     int sdlRtn  = SDL.SDL_RenderCopy(renderer, texture, ref srcRectToSend, (nint)null);
                     if (sdlRtn != 0)
                     {
-                        Console.WriteLine("Problem with RenderCopy in SDLScale_RenderCopy");
+                        Console.WriteLine("Problem with RenderCopy in SDLScale_RenderCopy 3 ");
                         Console.ReadLine();
                     }
                 }
@@ -78,7 +80,7 @@ namespace ag
                     int sdlRtn  = SDL.SDL_RenderCopy(renderer, texture, (nint)null, (nint)null);
                     if (sdlRtn != 0)
                     {
-                        Console.WriteLine("Problem with RenderCopy in SDLScale_RenderCopy");
+                        Console.WriteLine("Problem with RenderCopy in SDLScale_RenderCopy 4 ");
                         Console.ReadLine();
                     }
                 }
