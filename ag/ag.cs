@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Microsoft.VisualBasic;
 using SDL2;
+using static icecream.IceCream;
 
 
 
@@ -147,9 +148,9 @@ namespace ag
         /// <summary>answerBoxKnown</summary>
         public static IntPtr answerBoxKnown = IntPtr.Zero;
         /// <value>The list of sprites containing the graphical time representation</value>
-        public static Sprite? clockSprite = null;
+        public static Sprite clockSprite = new Sprite(5);
         /// <value>The list of sprites containing the graphical score representation</value>
-        public static Sprite? scoreSprite = null;
+        public static Sprite scoreSprite = new Sprite(5);
 
         // audio vars
         /// <value>The flag representing if the audio is enabled</value>
@@ -227,11 +228,9 @@ namespace ag
             Sound thisSound = new Sound(name: name, audioChunk: Audio_chunk);
 
             // thisSound.Name = name;
-            thisSound.Next = soundCache;
-
             // thisSound.Audio_chunk = Audio_chunk;
 
-
+            thisSound.Next = soundCache;
 
             soundCache = thisSound;
         }
@@ -887,10 +886,10 @@ namespace ag
         public static void UpdateTime(IntPtr screen)
         {
             SDL.SDL_Rect fromRect;
-            fromRect.x = 0;
-            fromRect.y = 0;
-            fromRect.w = CLOCK_WIDTH;
-            fromRect.h = CLOCK_HEIGHT;
+            fromRect.x = 0; // position on the numberbank band (x CLOCKWIDTH)
+            fromRect.y = 0; // position on the numberbank band (x CLOCKHEIGHT) - but as only one line, always 0
+            fromRect.w = CLOCK_WIDTH; // width of the character in the timebox in px
+            fromRect.h = CLOCK_HEIGHT; // height of the character in px
 
             int thisTime = AVAILABLE_TIME - gameTime;
             TimeSpan timeSpan = TimeSpan.FromSeconds(thisTime);
@@ -902,7 +901,7 @@ namespace ag
             int secondsTens = seconds / 10;
             int secondsUnits = seconds % 10;
 
-            clockSprite = new Sprite(5);
+            // clockSprite = new Sprite(5);
             fromRect.x = CLOCK_WIDTH * minutesTens;
             clockSprite.sprite[0].sprite_band_dimensions = fromRect;
             fromRect.x = CLOCK_WIDTH * minutesUnits;
@@ -1060,8 +1059,8 @@ namespace ag
 
 
             int len = Shuffle.Length;
-            thisLetter = new Sprite(len);
-            previousLetter = new Sprite(len);
+            thisLetter = new Sprite(1);
+            previousLetter = new Sprite(1);
 
             for (int i = 0; i < len; i++)
             {
@@ -1073,10 +1072,10 @@ namespace ag
                     rect.x = chr * GAME_LETTER_WIDTH;
                     thisLetter.numSpr = 1;
 
-                    thisLetter.sprite[i].sprite_band_texture = letterBank;
-                    thisLetter.sprite[i].sprite_band_dimensions = rect;
-                    thisLetter.sprite[i].sprite_x_offset = 0;
-                    thisLetter.sprite[i].sprite_y_offset = 0;
+                    thisLetter.sprite[0].sprite_band_texture = letterBank;
+                    thisLetter.sprite[0].sprite_band_dimensions = rect;
+                    thisLetter.sprite[0].sprite_x_offset = 0;
+                    thisLetter.sprite[0].sprite_y_offset = 0;
 
                     thisLetter.letter = Shuffle[i];
                     thisLetter.x = random.Next(800); // this is to make the letter fly in from wherever on the screen to toX location
@@ -1115,7 +1114,7 @@ namespace ag
         public static void AddClock(ref Sprite letters, IntPtr screen)
         {
             Sprite thisLetter;
-            Sprite previousLetter;
+            Sprite? previousLetter = null;
             Sprite? current = letters;
             int index = 0;
 
@@ -1126,8 +1125,6 @@ namespace ag
             fromRect.h = CLOCK_HEIGHT;
 
             int lettercount = 0;
-
-
             while (current.next != null)
             {
                 lettercount++;
@@ -1137,7 +1134,7 @@ namespace ag
             }
 
             thisLetter = new Sprite(5); // 5 characters in the clock
-            previousLetter = new Sprite(5);
+            // previousLetter = new Sprite(1);
             thisLetter.numSpr = 5;
 
             // initialise with 05:00
@@ -1182,6 +1179,7 @@ namespace ag
             thisLetter.box = CONTROLS;
             thisLetter.index = index++;
 
+            // previousLetter = new Sprite(1);
             previousLetter.next = thisLetter;
             clockSprite = thisLetter;
 
@@ -1198,7 +1196,7 @@ namespace ag
         public static void AddScore(ref Sprite letters, IntPtr screen)
         {
             Sprite thisLetter;
-            Sprite previousLetter;
+            Sprite? previousLetter = null;
             Sprite? current = letters;
 
             SDL.SDL_Rect fromRect;   // dimensions of the numbers band image in px
@@ -1222,7 +1220,7 @@ namespace ag
             }
 
             thisLetter = new Sprite(5); // 5 characters in the score
-            previousLetter = new Sprite(5);
+            // previousLetter = new Sprite(5);
 
             // pre-loading: "    0"
             for (int i = 0; i < 5; i++)
@@ -1506,22 +1504,22 @@ namespace ag
 
                     switch (sdlEvent.type)
                     {
-                        // case SDL.SDL_EventType.SDL_USEREVENT:
-                        //     Console.WriteLine("HANDLING USEREVENT");
-                        //     timer_delay = (uint)(AnySpriteMoving(letters) ? 10 : 100);
-                        //     // SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
-                        //     // SDL.SDL_RenderClear(screen);
-                        //     // SDLScale_RenderCopy(screen, backgroundTex, null, dest);
-                        //     // DisplayAnswerBoxes(headNode, screen);
-                        //     // MoveSprite(screen, letters, letterSpeed);
-                        //     timer = SDL.SDL_AddTimer(timer_delay, TimerCallBack, IntPtr.Zero);
-                        //     break;
+                        case SDL.SDL_EventType.SDL_USEREVENT:
+                            // Console.WriteLine("HANDLING USEREVENT");
+                            timer_delay = (uint)(AnySpriteMoving(letters) ? 10 : 100);
+                            SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
+                            SDL.SDL_RenderClear(screen);
+                            SDLScale_RenderCopy(screen, backgroundTex, null, dest);
+                            DisplayAnswerBoxes(headNode, screen);
+                            MoveSprites(screen, letters, letterSpeed);
+                            timer = SDL.SDL_AddTimer(timer_delay, TimerCallBack, IntPtr.Zero);
+                            break;
 
                         case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
-                            Console.WriteLine("HANDLING MOUSE EVENT");
-                            Console.WriteLine($"Before {sdlEvent.button.x} - {sdlEvent.button.y}");
+                            // Console.WriteLine("HANDLING MOUSE EVENT");
+                            // Console.WriteLine($"Before {sdlEvent.button.x} - {sdlEvent.button.y}");
                             SDLScale_MouseEvent(ref sdlEvent);
-                            Console.WriteLine($"After {sdlEvent.button.x} - {sdlEvent.button.y}");
+                            // Console.WriteLine($"After {sdlEvent.button.x} - {sdlEvent.button.y}");
                             ClickDetect(sdlEvent.button.button, sdlEvent.button.x, sdlEvent.button.y, screen, headNode, letters);
                             break;
 
@@ -1611,11 +1609,16 @@ namespace ag
 
                 // Console.WriteLine("OUTSIDE EVENT LOOP");
 
-                if (winGame)
+                if (letters.x != letters.toX)
                 {
-                    stopTheClock = true;
-                    solvePuzzle = true;
+                    Console.WriteLine($"x {letters.x} - toX {letters.toX} - y {letters.y} toY {letters.toY}");
                 }
+
+                if (winGame)
+                    {
+                        stopTheClock = true;
+                        solvePuzzle = true;
+                    }
 
                 if ((gameTime < AVAILABLE_TIME) && !stopTheClock)
                 {
@@ -1705,16 +1708,19 @@ namespace ag
 
                 // Present the renderer
 
+
+                // Console.WriteLine("Updating the screen");
+
                 SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
                 SDL.SDL_RenderClear(screen);
                 SDLScale_RenderCopy(screen, backgroundTex, null, dest);
                 DisplayAnswerBoxes(headNode, screen);
-                MoveSprite(screen, letters, letterSpeed);
+                MoveSprites(screen, letters, letterSpeed);
 
                 SDL.SDL_RenderPresent(screen);
                 
                 // Add a small delay to prevent CPU overuse
-                SDL.SDL_Delay(16); // roughly 60 FPS
+                // SDL.SDL_Delay(16); // roughly 60 FPS
 
             }
         }
