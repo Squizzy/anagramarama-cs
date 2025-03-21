@@ -10,13 +10,13 @@ namespace ag
         /// <returns>Nothing</returns>
         public static void ShowSprite(IntPtr screen, Sprite movie)
         {
-            SDL.SDL_Rect rect = new()
-            {
-                x = movie.x,
-                y = movie.y,
-                w = movie.w,
-                h = movie.h
-            };
+            SDL.SDL_Rect rect = new SDL.SDL_Rect();
+
+            rect.x = movie.x;
+            rect.y = movie.y;
+            rect.w = movie.w;
+            rect.h = movie.h;
+            
 
             for (int i = 0; i < movie.numSpr; i++)
             {
@@ -42,15 +42,27 @@ namespace ag
         /// <returns>false if a sprite needs to move</returns>
         public static bool AnySpriteMoving(Sprite letters)
         {
-            Sprite current;
-            for (current = letters; current != null; current = current.next)
+            Sprite? current = letters;
+
+            while (current != null)
             {
                 if (IsSpriteMoving(current))
                 {
                     return false;
                 }
+                current = current.next;
             }
+
             return true;
+            // Sprite current;
+            // for (current = letters; current != null; current = current.next)
+            // {
+            //     if (IsSpriteMoving(current))
+            //     {
+            //         return false;
+            //     }
+            // }
+            // return true;
         }
 
         /// <summary> Moves a sprite </summary>
@@ -58,6 +70,8 @@ namespace ag
         /// <param name="movie">The sprite to move</param>
         /// <param name="letterSpeed">The speed to move the sprite at</param>
         /// <returns>Nothing</returns>
+
+
         public static void MoveSprite(IntPtr screen, Sprite movie, int letterSpeed)
         {
             int Xsteps;
@@ -70,8 +84,14 @@ namespace ag
 
                 if (y != 0)
                 {
-                    if (x < 0) x *= -1;
-                    if (y < 0) y *= -1;
+                    if (x < 0)
+                    {
+                        x *= -1;
+                    }
+                    if (y < 0)
+                    {
+                        y *= -1;
+                    }
                     Xsteps = (x / y) * letterSpeed;
                 }
                 else
@@ -81,28 +101,40 @@ namespace ag
 
                 for (int i = 0; i < Xsteps; i++)
                 {
-                    if (movie.x < movie.toX) movie.x++;
-                    if (movie.x > movie.toX) movie.x--;
+                    if (movie.x < movie.toX)
+                    {
+                        movie.x++;
+                    }
+                    if (movie.x > movie.toX)
+                    {
+                        movie.x--;
+                    }
                 }
 
                 for (int i = 0; i < letterSpeed; i++)
                 {
-                    if (movie.y < movie.toY) movie.y++;
-                    if (movie.y > movie.toY) movie.y--;
+                    if (movie.y < movie.toY)
+                    {
+                        movie.y++;
+                    }
+                    if (movie.y > movie.toY)
+                    {
+                        movie.y--;
+                    }
                 }
             }
         }
+
 
         /// <summary> Animate the moving of the sprites </summary>
         /// <param name="screen">the renderer the sprites move on</param>
         /// <param name="letters">the sprites to move</param>
         /// <param name="letterSpeed">the speed of the move</param>
         /// <returns>Nothing</returns>
-        public static void MoveSprites(ref IntPtr screen, Sprite letters, int letterSpeed)
+        public static void MoveSprites(IntPtr screen, Sprite letters, int letterSpeed)
         {
-            Sprite? current;
+            Sprite? current = letters;
 
-            current = letters;
             while (current != null)
             {
                 MoveSprite(screen, current, letterSpeed);
