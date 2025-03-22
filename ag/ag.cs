@@ -84,7 +84,7 @@ namespace ag
         /// <summary>txt</summary>
         public static string txt = "";
         /// <summary>rootword</summary>
-        public static char[] rootword = new char[9];
+        public static string rootword = "";
         /// <summary>updateAnswers</summary>
         public static bool updateAnswers = false;
         /// <summary>startNewGame</summary>
@@ -287,8 +287,8 @@ namespace ag
 
 
         /// <summary> load the named image to position x,y onto the required surface 
-        // NOTE: Unused functionality
-        // </summary>
+        /// NOTE: Unused functionality
+        /// </summary>
         /// <param name="file">the filename to load (.BMP)</param>
         /// <param name="screen">the SDL_Surface to display the image</param>
         /// <returns>Nothing</returns>
@@ -331,26 +331,43 @@ namespace ag
             int numLetters = 0;
             int listLetters = 0;
 
+            // create the unknown and known (small) answerbox texture
             if (answerBoxUnknown == IntPtr.Zero)
             {
+                // create an empty texture
+                IntPtr box = SDL.SDL_CreateRGBSurface(0, 16, 16, 32, 0, 0, 0, 0);
+
+                // coordinates of the border corners
                 outerRect.w = 16;
                 outerRect.h = 16;
                 outerRect.x = 0;
                 outerRect.y = 0;
-                IntPtr box = SDL.SDL_CreateRGBSurface(0, 16, 16, 32, 0, 0, 0, 0);
+
+                // draw the border rectangle on the texture
                 SDL.SDL_FillRect(box, ref outerRect, 0);
+
+                // coordinate of the inner rectangle (border rectangle -/+ boder thickness)
                 innerRect.w = outerRect.w - 1;
                 innerRect.h = outerRect.h - 1;
                 innerRect.x = outerRect.x + 1;
                 innerRect.y = outerRect.y + 1;
 
+                // Get a pointer to the surface of the box
                 SDL.SDL_Surface surface = Marshal.PtrToStructure<SDL.SDL_Surface>(box);
 
+                // fill in the texture with the inner rectangle, 
+                // applying the surface format of the texture with light blue colour
                 SDL.SDL_FillRect(box, ref innerRect, SDL.SDL_MapRGB(surface.format, 217, 220, 255));
+                // set this to the unknown answerbox as a texture
                 answerBoxUnknown = SDL.SDL_CreateTextureFromSurface(screen, box);
 
+                // fill in the texture with the inner rectangle, 
+                // applying the surface format of the texture with white colour
                 SDL.SDL_FillRect(box, ref innerRect, SDL.SDL_MapRGB(surface.format, 255, 255, 255));
+                // set this to the known answerbox as a texture
                 answerBoxKnown = SDL.SDL_CreateTextureFromSurface(screen, box);
+
+                // free the memory used by the temporary surface
                 SDL.SDL_FreeSurface(box);
             }
 
@@ -389,6 +406,7 @@ namespace ag
                     innerRect.x = outerRect.x + 1;
                     innerRect.y = outerRect.y + 1;
 
+                    // if the word was found, display the letter inside that box
                     if (current.found)
                     {
                         int c = (int)(current.anagram[i] - 'a');
@@ -465,7 +483,7 @@ namespace ag
             int len = NextBlank(answer) - 1;
             if (len == -1) len = answer.Length;
             test = answer[0..len];
-            test.ic();
+            // test.ic();
            
 
 
@@ -554,7 +572,7 @@ namespace ag
         /// <param name="box">the ANSWER or SHUFFLE box</param>
         /// <param name="index">pointer to the letter we're interested in</param>
         /// <returns>the coords of the next blank position</returns>
-        public static int NextBlankPosition(int box, int index)
+        public static int NextBlankPosition(int box, ref int index)
         {
             int i = 0;
 
@@ -563,6 +581,7 @@ namespace ag
                 case ANSWER:
                     
                     // Shuffle.ic($"{Shuffle} at {index}");
+                    // Shuffle.ic();
                     // Answer.ic();
                     for (i = 0; i < 7; i++)
                     {
@@ -587,34 +606,33 @@ namespace ag
                     // Answer.ic($"{Answer} at {index}");
                     // Shuffle.ic();
 
-
-                    // for (i = 0; i < 7; i++)
-                    // {
-                    //     if (Shuffle[i] == SPACE_CHAR)
-                    //     {
-                    //         break;
-                    //     }
-                    // }
                     for (i = 0; i < 7; i++)
                     {
-                        if (Answer[i] != SPACE_CHAR)
+                        if (Shuffle[i] == SPACE_CHAR)
                         {
                             break;
                         }
                     }
+                    // for (i = 0; i < 7; i++)
+                    // {
+                    //     if (Answer[i] != SPACE_CHAR)
+                    //     {
+                    //         break;
+                    //     }
+                    // }
                     // New: if no SPACE_CHAR found in Answer, 
                     // i becomes 7 creating out of bound exception
                     // not an issue is C due to the null char to end a string
                     if (i < 7)
-                    {
-                        Shuffle[index] = Answer[i];
-                        Answer[i] = SPACE_CHAR;
-                        i = index;
-                    }
                     // {
-                    //     Shuffle[i] = Answer[index];
-                    //     Answer[index] = SPACE_CHAR;
+                    //     Shuffle[index] = Answer[i];
+                    //     Answer[i] = SPACE_CHAR;
+                    //     i = index;
                     // }
+                    {
+                        Shuffle[i] = Answer[index];
+                        Answer[index] = SPACE_CHAR;
+                    }
                     // Shuffle.ic();
                     // Answer.ic();
                     break;
@@ -623,9 +641,10 @@ namespace ag
                     break;
             }
 
-            // index = i;
+            index = i;
 
-            return i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X;
+            // return the toX position in the target box of the letter returned
+            return i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X; 
         }
 
 
@@ -688,7 +707,7 @@ namespace ag
                         {
                             if (current.box == ANSWER && current.index == maxIndex)
                             {
-                                current.toX = NextBlankPosition(SHUFFLE, current.index);
+                                current.toX = NextBlankPosition(SHUFFLE, ref current.index);
                                 current.toY = SHUFFLE_BOX_Y;
                                 current.box = SHUFFLE;
                                 if (audio_enabled)
@@ -723,7 +742,7 @@ namespace ag
                             {
                                 if (current.letter == (char)keyedLetter)
                                 {
-                                    current.toX = NextBlankPosition(ANSWER, current.index);
+                                    current.toX = NextBlankPosition(ANSWER, ref current.index);
                                     current.toY = ANSWER_BOX_Y;
                                     current.box = ANSWER;
                                     if (audio_enabled)
@@ -791,7 +810,7 @@ namespace ag
                     {
                         if (current.box == SHUFFLE)
                         {
-                            current.toX = NextBlankPosition(ANSWER, current.index);
+                            current.toX = NextBlankPosition(ANSWER, ref current.index);
                             current.toY = ANSWER_BOX_Y;
                             current.box = ANSWER;
                             if (audio_enabled)
@@ -801,7 +820,7 @@ namespace ag
                         }
                         else
                         {
-                            current.toX = NextBlankPosition(SHUFFLE, current.index);
+                            current.toX = NextBlankPosition(SHUFFLE, ref current.index);
                             current.toY = SHUFFLE_BOX_Y;
                             current.box = SHUFFLE;
                             if (audio_enabled)
@@ -892,7 +911,7 @@ namespace ag
             {
                 if (orderedLetters[i] != null)
                 {
-                    orderedLetters[i].toX = NextBlankPosition(SHUFFLE, orderedLetters[i].index);
+                    orderedLetters[i].toX = NextBlankPosition(SHUFFLE, ref orderedLetters[i].index);
                 }
             }
 
@@ -1187,7 +1206,7 @@ namespace ag
             {
                 lettercount++;
                 // Console.WriteLine($"letter {lettercount}: {current.letter}");
-                current.letter.ic($"{lettercount}");
+                // current.letter.ic($"{lettercount}");
                 previousLetter = current;
                 current = current.next;
             }
@@ -1317,6 +1336,16 @@ namespace ag
         }
 
 
+        static void listHead(Node head)
+        {
+            Node current = head;
+            while (current != null)
+            {
+                current.anagram.ic($"{current.length}");
+                current = current.next;
+            }
+        }
+
         /// <summary> Do all of the initialisation for a new game:
         /// build the screen
         /// get a random word and generate anagrams
@@ -1328,14 +1357,14 @@ namespace ag
         /// <param name="screen">SDL_Surface to display the image</param>
         /// <param name="letters">first node in the letter sprites (in/out)</param>
         /// <returns>Nothing</returns>
-        public static void NewGame(ref Node headNode, Dlb_node dlbHeadNode, IntPtr screen, ref Sprite letters)
+        public static void NewGame(ref Node? headNode, Dlb_node dlbHeadNode, IntPtr screen, ref Sprite letters)
         {
             // letters in the guess box
             // char[] guess = new char[7];
             // char[] remain = new char[7];
-            string guess = "";
+            string guess;
             string remain = "";
-            
+
             // happy is true if we have < 67 anagrams and => 6
             bool happy = false;
 
@@ -1370,20 +1399,23 @@ namespace ag
             {
                 // char[] buffer = new char[9];
                 // string bufferString = new string(buffer);
-                string bufferString ="";
+                // string bufferString ="";
                 // changed this max size from original game
-                GetRandomWord(ref bufferString, MAX_ANAGRAM_LENGTH);
-                rootword = bufferString.ToCharArray();
-                bigWordLen = rootword.Length;
-                remain = new string(rootword);
+                GetRandomWord(ref rootword, MAX_ANAGRAM_LENGTH);
+                // rootword = bufferString.ToCharArray();
+                // rootword += " ";
+                bigWordLen = rootword.Length - 1; // GetRandomWord adds an extra space at the end
+                guess = "";
+                remain = rootword;
+                rootword.ic();
 
                 DestroyAnswers(ref headNode);
 
-                string guessString = guess;
-                string remainString = remain;
+                // string remainString = remain;
                 // string guessString = new string(guess);
                 // string remainString = new string(remain);
-                Ag(ref headNode, dlbHeadNode, guessString, remainString);
+                // Ag(ref headNode, dlbHeadNode, guessString, remainString);
+                Ag(ref headNode, dlbHeadNode, guess, remain);
 
 
                 answersSought = Length(headNode);
@@ -1392,15 +1424,20 @@ namespace ag
 
             }
 
+            listHead(headNode);
+
+            rootword.ic();
+
+            // headNode.ic();
             /* now we have a good set of words - sort them alphabetically */
             Sort(ref headNode);
 
             for (int i = bigWordLen; i < 7; i++)
             {
                 // remain[i] = SPACE_CHAR;
-                remain = remain[0..(i - 1)] + SPACE_CHAR + remain[(i + 1)..remain.Length];
+                remain = remain[0..(i - 1)] + SPACE_CHAR;
             }
-            // remain[7] = '0';  // might be superfluous with C#
+            remain = remain[0..7]; // making sure we don't have extra chars
             // remain[bigWordLen] = '\0'; // might be superfluous with C#
             char[] remainToShuffle = remain.ToCharArray();
             ShuffleWord(ref remainToShuffle);
@@ -1683,10 +1720,12 @@ namespace ag
                 if ((gameTime < AVAILABLE_TIME) && !stopTheClock)
                 {
                     timeNow = DateTime.Now - gameStart;
+
+                    int timeNowSeconds = timeNow.Minutes * 60 + timeNow.Seconds;
                     // Console.WriteLine($"{gameStart} - {timeNow.Seconds} - {gameTime}");
-                    if (timeNow.Seconds != gameTime)
+                    if (timeNowSeconds != gameTime)
                     {
-                        gameTime = timeNow.Seconds;
+                        gameTime = timeNowSeconds;
                         UpdateTime(screen);
                     }
                 }
@@ -1707,7 +1746,7 @@ namespace ag
                     SolveIt(headNode);
                     ClearWord(letters);
                     Shuffle = SPACE_FILLED_STRING.ToCharArray();
-                    Answer = rootword;
+                    Answer = rootword.Trim().ToCharArray();
                     gamePaused = true;
                     if (!stopTheClock)
                     {
