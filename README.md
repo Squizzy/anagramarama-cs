@@ -1,6 +1,7 @@
 # How to use
 - should work in Windows, (Linux and MacOS not tested yet)
 - Grab the source code and Dotnet (8.0+) and compile. Place the i18n (dictionary(ies), images, and config.ini (if present)), as well as the sounds in the appropriate location.
+- place for the i18n and sounds is set to System.Environment.SpecialFolder.ApplicationData. Check where this goes for your os [here](https://jimrich.sk/environment-specialfolder-on-windows-linux-and-os-x/)
 
 
 # What this is
