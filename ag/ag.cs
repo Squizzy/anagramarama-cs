@@ -1336,15 +1336,21 @@ namespace ag
         }
 
 
-        static void listHead(Node head)
+        /// <summary> method to display the list of anagrams to be played, in the console
+        /// Used for debug if needed
+        /// </summary>
+        /// <param name="headNode">the first node in the list of anagrams</param>
+        /// <returns>Nothing</results>
+        static void listHead(Node headNode)
         {
-            Node current = head;
+            Node current = headNode;
             while (current != null)
             {
                 current.anagram.ic($"{current.length}");
                 current = current.next;
             }
         }
+
 
         /// <summary> Do all of the initialisation for a new game:
         /// build the screen
@@ -1357,7 +1363,7 @@ namespace ag
         /// <param name="screen">SDL_Surface to display the image</param>
         /// <param name="letters">first node in the letter sprites (in/out)</param>
         /// <returns>Nothing</returns>
-        public static void NewGame(ref Node? headNode, Dlb_node dlbHeadNode, IntPtr screen, ref Sprite letters)
+        static void NewGame(ref Node? headNode, Dlb_node dlbHeadNode, IntPtr screen, ref Sprite letters)
         {
             // letters in the guess box
             // char[] guess = new char[7];
