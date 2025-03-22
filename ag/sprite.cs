@@ -71,10 +71,16 @@ namespace ag
         /// <param name="letterSpeed">The speed to move the sprite at</param>
         /// <returns>Nothing</returns>
 
-
+        // TODO: Optimise
         public static void MoveSprite(IntPtr screen, Sprite movie, int letterSpeed)
         {
             int Xsteps;
+
+            // new, for efficiency
+            if (movie.x == movie.toX && movie.y == movie.toY)
+            {
+                return;
+            }
 
             // move a sprite from its curent location to the new location
             if ((movie.y != movie.toY) || (movie.x != movie.toX))
