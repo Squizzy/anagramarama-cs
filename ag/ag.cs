@@ -448,23 +448,31 @@ namespace ag
         {
             Node? current = headNode;
             bool foundWord = false;
-            //bool foundAllLength = true; // used for Gamerzilla - ignored here
-            char[] test = new char[8];
+            bool foundAllLength = true; // used for Gamerzilla - ignored here
+            // char[] test = new char[8];
 
+            // int len = NextBlank(answer) - 1;
+            // if (len == -1)
+            // {
+            //     len = test.Length - 1;
+            // }
+            // for (int i = 0; i < len; i++)
+            // {
+            //     test[i] = answer[i];
+            // }
+            string test;
             int len = NextBlank(answer) - 1;
-            if (len == -1)
-            {
-                len = test.Length - 1;
-            }
-            for (int i = 0; i < len; i++)
-            {
-                test[i] = answer[i];
-            }
+            if (len == -1) len = answer.Length;
+            test = answer[0..len];
+           
+
 
             while (current != null)
             {
-                if (current.anagram == new string(test))
+                // if (current.anagram == new string(test))
+                if (current.anagram == test)
                 {
+                    foundWord = true;
                     if (!current.found)
                     {
                         score += current.length;
@@ -486,6 +494,7 @@ namespace ag
                                 }
                             }
                         }
+
                         if (answersSought == answersGot)
                         {
                             // getting all answers gives us the game score again!!
@@ -511,12 +520,11 @@ namespace ag
             }
 
             current = headNode;
-
             while (current != null)
             {
                 if ((!current.found) && (len == current.anagram.Length))
                 {
-                    //foundAllLength = false; // used for gamerzilla - ignored here
+                    foundAllLength = false; // used for gamerzilla - ignored here
                 }
                 current = current.next;
             }
@@ -558,8 +566,14 @@ namespace ag
                             break;
                         }
                     }
-                    Answer[i] = Shuffle[index];
-                    Shuffle[index] = SPACE_CHAR;
+                    // New: if no SPACE_CHAR found in Answer, 
+                    // i becomes 7 creating out of bound exception
+                    // not an issue is C due to the null char to end a string
+                    if (i < 7)
+                    {
+                        Answer[i] = Shuffle[index];
+                        Shuffle[index] = SPACE_CHAR;
+                    }
                     break;
 
                 case SHUFFLE:
@@ -570,8 +584,14 @@ namespace ag
                             break;
                         }
                     }
-                    Shuffle[i] = Answer[index];
-                    Answer[index] = SPACE_CHAR;
+                    // New: if no SPACE_CHAR found in Answer, 
+                    // i becomes 7 creating out of bound exception
+                    // not an issue is C due to the null char to end a string
+                    if (i < 7)
+                    {
+                        Shuffle[i] = Answer[index];
+                        Answer[index] = SPACE_CHAR;
+                    }
                     break;
 
                 default:
@@ -703,7 +723,7 @@ namespace ag
         /// <returns>true if clicked inside the box, false otherwise</returns>
         public static bool IsInside(Box box, int x, int y)
         {
-            Console.WriteLine($"x {x} - {(x > box.x) && (x < (box.x + box.width))} - [ x {box.x} | x + w {box.x + box.width}] - y {y} - {(y > box.y) && (y < (box.y + box.height))} - [y {box.y} | y + h {box.y + box.height}");
+            Console.WriteLine($"x {x} - {(x > box.x) && (x < (box.x + box.width))} - [ x {box.x} | x + w {box.x + box.width}] y {y} - {(y > box.y) && (y < (box.y + box.height))} - [y {box.y} | y + h {box.y + box.height}]");
             return (x > box.x) && (x < (box.x + box.width)) && (y > box.y) && (y < (box.y + box.height));
         }
 
@@ -741,6 +761,7 @@ namespace ag
             {
                 while (current != null && current.box != CONTROLS)
                 {
+                    // Have we clicked on this current letter (from letters), be it in answer or shuffle box?
                     if (x >= current.x && x <= (current.x + current.w) && y >= current.y && y <= (current.y + current.h))
                     {
                         if (current.box == SHUFFLE)
@@ -824,17 +845,22 @@ namespace ag
             //     orderedLetters[i] = null;
             // }
 
-            while (current != null)
+            for (int i = 0; i < orderedLetters.Length; ++i)
             {
-                if (current.box == ANSWER)
-                {
-                    count++;
-                    orderedLetters[current.index] = current;
-                    current.toX = SHUFFLE_BOX_Y;
-                    current.box = SHUFFLE;
-                }
-                current = current.next;
+                orderedLetters[i] = new Sprite(1);
             }
+
+            while (current != null)
+                {
+                    if (current.box == ANSWER)
+                    {
+                        count++;
+                        orderedLetters[current.index] = current;
+                        current.toY = SHUFFLE_BOX_Y;
+                        current.box = SHUFFLE;
+                    }
+                    current = current.next;
+                }
 
             for (int i = 0; i < 7; i++)
             {
@@ -1511,16 +1537,16 @@ namespace ag
 
                     switch (sdlEvent.type)
                     {
-                        case SDL.SDL_EventType.SDL_USEREVENT:
-                            // Console.WriteLine("HANDLING USEREVENT");
-                            timer_delay = (uint)(AnySpriteMoving(letters) ? 10 : 100);
-                            SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
-                            SDL.SDL_RenderClear(screen);
-                            SDLScale_RenderCopy(screen, backgroundTex, null, dest);
-                            DisplayAnswerBoxes(headNode, screen);
-                            MoveSprites(screen, letters, letterSpeed);
-                            timer = SDL.SDL_AddTimer(timer_delay, TimerCallBack, IntPtr.Zero);
-                            break;
+                        // case SDL.SDL_EventType.SDL_USEREVENT:
+                        //     // Console.WriteLine("HANDLING USEREVENT");
+                        //     timer_delay = (uint)(AnySpriteMoving(letters) ? 10 : 100);
+                        //     SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
+                        //     SDL.SDL_RenderClear(screen);
+                        //     SDLScale_RenderCopy(screen, backgroundTex, null, dest);
+                        //     DisplayAnswerBoxes(headNode, screen);
+                        //     MoveSprites(screen, letters, letterSpeed);
+                        //     timer = SDL.SDL_AddTimer(timer_delay, TimerCallBack, IntPtr.Zero);
+                        //     break;
 
                         case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
                             // Console.WriteLine("HANDLING MOUSE EVENT");
