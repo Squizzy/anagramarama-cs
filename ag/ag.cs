@@ -1,5 +1,6 @@
 using System.Diagnostics.Tracing;
 using System.Globalization;
+using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -449,7 +450,7 @@ namespace ag
             Node? current = headNode;
             bool foundWord = false;
             bool foundAllLength = true; // used for Gamerzilla - ignored here
-            // char[] test = new char[8];
+                                        // char[] test = new char[8];
 
             // int len = NextBlank(answer) - 1;
             // if (len == -1)
@@ -464,6 +465,7 @@ namespace ag
             int len = NextBlank(answer) - 1;
             if (len == -1) len = answer.Length;
             test = answer[0..len];
+            test.ic();
            
 
 
@@ -556,9 +558,12 @@ namespace ag
         {
             int i = 0;
 
-            switch (box)
+            switch (box)  // destination box for the letter
             {
                 case ANSWER:
+                    
+                    // Shuffle.ic($"{Shuffle} at {index}");
+                    // Answer.ic();
                     for (i = 0; i < 7; i++)
                     {
                         if (Answer[i] == SPACE_CHAR)
@@ -574,12 +579,25 @@ namespace ag
                         Answer[i] = Shuffle[index];
                         Shuffle[index] = SPACE_CHAR;
                     }
+                    // Shuffle.ic();
+                    // Answer.ic();
                     break;
 
                 case SHUFFLE:
+                    // Answer.ic($"{Answer} at {index}");
+                    // Shuffle.ic();
+
+
+                    // for (i = 0; i < 7; i++)
+                    // {
+                    //     if (Shuffle[i] == SPACE_CHAR)
+                    //     {
+                    //         break;
+                    //     }
+                    // }
                     for (i = 0; i < 7; i++)
                     {
-                        if (Shuffle[i] == SPACE_CHAR)
+                        if (Answer[i] != SPACE_CHAR)
                         {
                             break;
                         }
@@ -589,16 +607,23 @@ namespace ag
                     // not an issue is C due to the null char to end a string
                     if (i < 7)
                     {
-                        Shuffle[i] = Answer[index];
-                        Answer[index] = SPACE_CHAR;
+                        Shuffle[index] = Answer[i];
+                        Answer[i] = SPACE_CHAR;
+                        i = index;
                     }
+                    // {
+                    //     Shuffle[i] = Answer[index];
+                    //     Answer[index] = SPACE_CHAR;
+                    // }
+                    // Shuffle.ic();
+                    // Answer.ic();
                     break;
 
                 default:
                     break;
             }
 
-            index = i;
+            // index = i;
 
             return i * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE) + BOX_START_X;
         }
@@ -723,7 +748,7 @@ namespace ag
         /// <returns>true if clicked inside the box, false otherwise</returns>
         public static bool IsInside(Box box, int x, int y)
         {
-            Console.WriteLine($"x {x} - {(x > box.x) && (x < (box.x + box.width))} - [ x {box.x} | x + w {box.x + box.width}] y {y} - {(y > box.y) && (y < (box.y + box.height))} - [y {box.y} | y + h {box.y + box.height}]");
+            // Console.WriteLine($"x {x} - {(x > box.x) && (x < (box.x + box.width))} - [ x {box.x} | x + w {box.x + box.width}] y {y} - {(y > box.y) && (y < (box.y + box.height))} - [y {box.y} | y + h {box.y + box.height}]");
             return (x > box.x) && (x < (box.x + box.width)) && (y > box.y) && (y < (box.y + box.height));
         }
 
@@ -829,7 +854,7 @@ namespace ag
         }
 
 
-        // TODO: Clarify what the return is
+        // TODO: Clarify what the return is - just for playing a sound should be a bool
         /// <summary> move all letters from answer to shuffle </summary>
         /// <param name="letters">the letter sprites</param>
         /// <returns>the count of??? letters cleared, used to play a sound if not null??</returns>
@@ -845,16 +870,17 @@ namespace ag
             //     orderedLetters[i] = null;
             // }
 
-            for (int i = 0; i < orderedLetters.Length; ++i)
-            {
-                orderedLetters[i] = new Sprite(1);
-            }
+            // for (int i = 0; i < orderedLetters.Length; ++i)
+            // {
+            //     orderedLetters[i] = new Sprite(1);
+            // }
 
             while (current != null)
                 {
                     if (current.box == ANSWER)
                     {
                         count++;
+                        orderedLetters[current.index] = new Sprite(1);
                         orderedLetters[current.index] = current;
                         current.toY = SHUFFLE_BOX_Y;
                         current.box = SHUFFLE;
@@ -1160,7 +1186,8 @@ namespace ag
             while (current.next != null)
             {
                 lettercount++;
-                Console.WriteLine($"letter {lettercount}: {current.letter}");
+                // Console.WriteLine($"letter {lettercount}: {current.letter}");
+                current.letter.ic($"{lettercount}");
                 previousLetter = current;
                 current = current.next;
             }
@@ -1312,8 +1339,8 @@ namespace ag
             // happy is true if we have < 67 anagrams and => 6
             bool happy = false;
 
-            int answerSought = 0;
-            int bigWordLen = 0;
+            // int answerSought = 0;
+            // int bigWordLen = 0;
 
             SDL.SDL_Rect dest;
             dest.x = 0;
@@ -1359,9 +1386,9 @@ namespace ag
                 Ag(ref headNode, dlbHeadNode, guessString, remainString);
 
 
-                answerSought = Length(headNode);
+                answersSought = Length(headNode);
 
-                happy = (answerSought <= 77) && (answerSought >= 6);
+                happy = (answersSought <= 77) && (answersSought >= 6);
 
             }
 
@@ -1557,18 +1584,18 @@ namespace ag
                             break;
 
                         case SDL.SDL_EventType.SDL_KEYUP:
-                            Console.WriteLine("HANDLING KEYUP");
+                            // Console.WriteLine("HANDLING KEYUP");
                             HandleKeyboardEvent(sdlEvent, headNode, letters);
                             break;
 
                         case SDL.SDL_EventType.SDL_QUIT:
-                            Console.WriteLine("HANDLING QUIT");
+                            // Console.WriteLine("HANDLING QUIT");
                             // done = true;
                             quitGame = true;
                             break;
 
                         case SDL.SDL_EventType.SDL_WINDOWEVENT:
-                            Console.WriteLine("HANDLING WINDOWEVENT");
+                            // Console.WriteLine("HANDLING WINDOWEVENT");
                             if ((sdlEvent.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED) ||
                                     (sdlEvent.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_SIZE_CHANGED))
                             {
@@ -1642,10 +1669,10 @@ namespace ag
 
                 // Console.WriteLine("OUTSIDE EVENT LOOP");
 
-                if (letters.x != letters.toX)
-                {
-                    Console.WriteLine($"x {letters.x} - toX {letters.toX} - y {letters.y} toY {letters.toY}");
-                }
+                // if (letters.x != letters.toX)
+                // {
+                //     Console.WriteLine($"x {letters.x} - toX {letters.toX} - y {letters.y} toY {letters.toY}");
+                // }
 
                 if (winGame)
                     {
@@ -2051,10 +2078,10 @@ namespace ag
                 Console.WriteLine("problem with background file");
                 Console.ReadLine();
             }
-            else
-            {
-                Console.WriteLine("Background ok");
-            }
+            // else
+            // {
+            //     Console.WriteLine("Background ok");
+            // }
             IntPtr backgroundSurf = SDL_image.IMG_Load(imagesPath + "background.png");
             backgroundTex = SDL.SDL_CreateTextureFromSurface(renderer, backgroundSurf);
             SDL.SDL_FreeSurface(backgroundSurf);
@@ -2065,10 +2092,10 @@ namespace ag
                 Console.WriteLine("problem with letterBank file");
                 Console.ReadLine();
             }
-                        else
-            {
-                Console.WriteLine("letterBank ok");
-            }
+            //             else
+            // {
+            //     Console.WriteLine("letterBank ok");
+            // }
             IntPtr letterSurf = SDL_image.IMG_Load(imagesPath + "letterBank.png");
             letterBank = SDL.SDL_CreateTextureFromSurface(renderer, letterSurf);
             SDL.SDL_FreeSurface(letterSurf);
@@ -2078,10 +2105,10 @@ namespace ag
                 Console.WriteLine("problem with smallLetterBank file");
                 Console.ReadLine();
             }
-            else
-            {
-                Console.WriteLine("smallLetterBank ok");
-            }
+            // else
+            // {
+            //     Console.WriteLine("smallLetterBank ok");
+            // }
             IntPtr smallLetterSurf = SDL_image.IMG_Load(imagesPath + "smallLetterBank.png");
             smallLetterBank = SDL.SDL_CreateTextureFromSurface(renderer, smallLetterSurf);
             SDL.SDL_FreeSurface(smallLetterSurf);
@@ -2091,10 +2118,10 @@ namespace ag
                 Console.WriteLine("problem with numberBank file");
                 Console.ReadLine();
             }
-            else
-            {
-                Console.WriteLine("numberBank ok");
-            }
+            // else
+            // {
+            //     Console.WriteLine("numberBank ok");
+            // }
             IntPtr numberSurf = SDL_image.IMG_Load(imagesPath + "numberBank.png");
             numberBank = SDL.SDL_CreateTextureFromSurface(renderer, numberSurf);
             SDL.SDL_FreeSurface(numberSurf);
