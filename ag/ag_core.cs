@@ -13,6 +13,7 @@ namespace ag
         /// </summary>
         /// <param name="thisString"></param>
         /// <returns>returns position of next blank (1 is first character) or 0 if no blanks found</returns>
+        // TODO: no need to use the +1
         public static int NextBlank(string thisString)
         {
             // +1 is needed to align with the 1-position of first character in original C application
