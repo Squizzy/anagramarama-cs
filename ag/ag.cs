@@ -1786,18 +1786,24 @@ namespace ag
                     shuffleRemaining = false;
                 }
 
-                if (clearGuess)
+                if (updateTheScore)
                 {
-                    // clear the guess
-                    if (ClearWord(letters) > 0)
-                    {
-                        if (audio_enabled)
-                        {
-                            SDL_mixer.Mix_PlayChannel(-1, GetSound("clear"), 0);
-                        }
-                        clearGuess = false;
-                    }
+                    UpdateScore(screen);
+                    updateTheScore = false;
                 }
+
+                if (clearGuess)
+                    {
+                        // clear the guess
+                        if (ClearWord(letters) > 0)
+                        {
+                            if (audio_enabled)
+                            {
+                                SDL_mixer.Mix_PlayChannel(-1, GetSound("clear"), 0);
+                            }
+                            clearGuess = false;
+                        }
+                    }
 
                 if (quitGame)
                 {
