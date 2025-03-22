@@ -1,4 +1,6 @@
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
+using icecream;
 
 namespace ag
 {
@@ -37,7 +39,8 @@ namespace ag
         /// <returns></returns>
         public static string ShiftLeft(string thisString)
         {
-            return string.Concat(thisString[1..] , thisString[..1]);
+            // return string.Concat(thisString[1..] , thisString[..1]);
+            return thisString[1..] + thisString[..1];
         }
 
         // Generate all possible combinations of the root word "remain" the initial letter is fixed (save under "head"), so to work out all anagrams in the dictionarydlbHead, prefix with space.
@@ -56,102 +59,144 @@ namespace ag
 
         public static void Ag(ref Node headNode, Dlb_node dlbHeadNode, string guess, string remain)
         {
-            char[] newGuess = guess.ToCharArray();
-            char[] newRemain = remain.ToCharArray();
+            string newGuess = guess;
+            string newRemain = remain;
+            // char[] newGuess = guess.ToCharArray();
+            // char[] newRemain = remain.ToCharArray();
 
-            int totalLen = 0, guessLen = 0, remainLen = 0;
+            // int totalLen = 0, guessLen = 0, remainLen = 0;
 
-            guessLen = guess.Trim().Length;
-            remainLen = remain.Trim().Length;
-            totalLen = guessLen + remainLen;
+            int guessLen = guess.Length;
+            int remainLen = remain.Length;
+            int totalLen = guessLen + remainLen;
 
             // add the element at last position of newRemain to newGuess
             // newGuess[guessLen] = newRemain[remainLen - 1];
-            guess = guess[0..(guess.Length)] + remain[(remain.Length-1)..];
+            // guess = guess[0..(guess.Length)] + remain[(remain.Length-1)..];
+            newGuess += newRemain[^1..];
 
             // remove the last element of newRemain
-            // newRemain = newRemain[..^1];
-            remain = remain[..^1];
+            // remain = remain[..^1];
+            newRemain = newRemain[..^1];
 
-            // If the newGuess word is more than 3 char
-            // if (newGuess.Length > 3)
-            if (guess.Length > 3)
+
+            //  If the newGuess word is more than 3 char
+            if (newGuess.Length > 3)
             {
                 // Shift its letters left dropping the first one
-                // string shiftLeftKilledString = ShitfLeftKill(new string(newGuess));
-                string shiftLeftKilledString = ShitfLeftKill(guess);
+                string shiftLeftKilledString = ShitfLeftKill(newGuess);
 
                 // If this is a word in the dictionary, add it to the anagrams linkedlist
                 if (DlbLookup(dlbHeadNode, shiftLeftKilledString))
                 {
+                    // shiftLeftKilledString.ic();
                     Push(ref headNode, shiftLeftKilledString);
                 }
+                // else
+                // {
+                //     shiftLeftKilledString.ic("discarded");
+                //  }
             }
 
-            // if (newRemain.Length > 0)
-            if (remain.Length > 0)
+            if (newRemain.Length > 0)
             {
                 // Recursively check other words
-                Ag(ref headNode, dlbHeadNode, guess, remain);
-                // Ag(ref headNode, dlbHeadNode, new string(newGuess), new string(newRemain));
+                Ag(ref headNode, dlbHeadNode, newGuess, newRemain);
 
                 // Then for all the total letters
                 for (int i = totalLen - 1; i > 0; i--)
                 {
                     // recursively try all the combinations of newRemain letters with the guess
-                    if (remain.Length > i)
-                    // if (newRemain.Length > i)
+                    if (newRemain.Length > i)
                     {
-                        remain = ShiftLeft(remain);
-                        // newRemain = ShiftLeft(new string(newRemain)).ToCharArray();
-                        Ag(ref headNode, dlbHeadNode, guess, remain);
-                        // Ag(ref headNode, dlbHeadNode, new string(newGuess), new string(newRemain));
+                        newRemain = ShiftLeft(newRemain);
+                        Ag(ref headNode, dlbHeadNode, newGuess, newRemain);
                     }
                 }
             }
 
+
+
+            // #####region 
+            // // If the newGuess word is more than 3 char
+            // // if (newGuess.Length > 3)
+            // if (guess.Length > 3)
+            // {
+            //     // Shift its letters left dropping the first one
+            //     // string shiftLeftKilledString = ShitfLeftKill(new string(newGuess));
+            //     string shiftLeftKilledString = ShitfLeftKill(guess);
+
+            //     // If this is a word in the dictionary, add it to the anagrams linkedlist
+            //     if (DlbLookup(dlbHeadNode, shiftLeftKilledString))
+            //     {
+            //         shiftLeftKilledString.ic();
+            //         Push(ref headNode, shiftLeftKilledString);
+            //     }
+            // }
+
+            // // if (newRemain.Length > 0)
+            // if (remain.Length > 0)
+            // {
+            //     // Recursively check other words
+            //     Ag(ref headNode, dlbHeadNode, guess, remain);
+            //     // Ag(ref headNode, dlbHeadNode, new string(newGuess), new string(newRemain));
+
+            //     // Then for all the total letters
+            //     for (int i = totalLen - 1; i > 0; i--)
+            //     {
+            //         // recursively try all the combinations of newRemain letters with the guess
+            //         if (remain.Length > i)
+            //         // if (newRemain.Length > i)
+            //         {
+            //             remain = ShiftLeft(remain);
+            //             // newRemain = ShiftLeft(new string(newRemain)).ToCharArray();
+            //             Ag(ref headNode, dlbHeadNode, guess, remain);
+            //             // Ag(ref headNode, dlbHeadNode, new string(newGuess), new string(newRemain));
+            //         }
+            //     }
+            // }
+            // ######endregion
             // //if (guess.Length != 0) 
             // for (int j = 0; j < guess.Length; j++) newGuess[j] = guess[j];
             // newRemain = remain.ToCharArray();
 
-                // newGuess[guessLen] = newRemain[remainLen - 1];
-                // newGuess[guessLen + 1] = '\0';  // null char
-                // newRemain[remainLen - 1] = '\0';
+            // newGuess[guessLen] = newRemain[remainLen - 1];
+            // newGuess[guessLen + 1] = '\0';  // null char
+            // newRemain[remainLen - 1] = '\0';
 
-                // string newGuessString = new string(newGuess).Trim('\0');
-                // string newRemainString = new string(newRemain).Trim('\0');
+            // string newGuessString = new string(newGuess).Trim('\0');
+            // string newRemainString = new string(newRemain).Trim('\0');
 
-                // if (newGuessString.Length > 3)
-                // {
-                //     string str = ShitfLeftKill(newGuessString);
-                //     if (Dlb_lookup(dlbHeadNode, str))
-                //     {
-                //         headNode = Push(headNode, str);
-                //     }
-                // }
+            // if (newGuessString.Length > 3)
+            // {
+            //     string str = ShitfLeftKill(newGuessString);
+            //     if (Dlb_lookup(dlbHeadNode, str))
+            //     {
+            //         headNode = Push(headNode, str);
+            //     }
+            // }
 
-                // if (newRemainString.Length != 0)
-                // {
-                //     //Ag(head, dlbHead, newGuess.ToString(), newRemain.ToString());
-                //     headNode = Ag(ref headNode, dlbHeadNode, newGuessString, newRemainString);
+            // if (newRemainString.Length != 0)
+            // {
+            //     //Ag(head, dlbHead, newGuess.ToString(), newRemain.ToString());
+            //     headNode = Ag(ref headNode, dlbHeadNode, newGuessString, newRemainString);
 
-                //     for (int i = totalLen - 1; i > 0; i--)
-                //     {
-                //         if (newRemainString.Length > i)
-                //         {
-                //             //newRemain = ShiftLeft(newRemain.ToString()).ToCharArray();
-                //             //Ag(head, dlbHead, newGuess.ToString(), newRemain.ToString());
-                //             newRemainString = ShiftLeft(newRemainString);
-                //             headNode = Ag(ref headNode, dlbHeadNode, newGuessString, newRemainString);
-                //         }
-                //     }
-                // }
-                // return headNode;
+            //     for (int i = totalLen - 1; i > 0; i--)
+            //     {
+            //         if (newRemainString.Length > i)
+            //         {
+            //             //newRemain = ShiftLeft(newRemain.ToString()).ToCharArray();
+            //             //Ag(head, dlbHead, newGuess.ToString(), newRemain.ToString());
+            //             newRemainString = ShiftLeft(newRemainString);
+            //             headNode = Ag(ref headNode, dlbHeadNode, newGuessString, newRemainString);
+            //         }
+            //     }
+            // }
+            // return headNode;
         }
 
 
-        /// <summary>
-        /// Get a random word in the dictionary file (not the dlb dictionary linked list)
+        /// <summary> Get a random word in the dictionary txt file (not the dlb dictionary linked list)
         /// [note from original C file] spin the word file to a random location and then loop until a 7 or 8 letter word is found
         /// This is quite a weak way to get a random word considering we've got a nice dbl Dictionary to hand - 
         /// but it works for now.
@@ -159,25 +204,43 @@ namespace ag
         /// <param name="randomWord">the referenced random word variable (will contain the random word found)</param>
         /// <param name="randomWordMinLength">The min length desired for the random word (7 or 8 in the original game)</param>
         /// <returns>Nothing as the result is passed by reference</returns>
-
         public static void GetRandomWord(ref string randomWord, int randomWordMinLength)
         {
-            string randomWordTemp;
+            // string randomWordTemp;
 
             string filename = language + "wordlist.txt";
 
             string[] lines = File.ReadAllLines(filename);
 
+            // int lineCount = lines.Length;
+            // lineCount.ic();
+
+            // Random rnd = new Random();
+            // do
+            // {
+            //     randomWordTemp = lines[rnd.Next(lineCount)];
+            // }
+            // while (randomWordTemp.Length < randomWordMinLength);
+
+            // randomWord = randomWordTemp;
+
+            lines = lines.Where(line => line.Length == randomWordMinLength).ToArray();
             int lineCount = lines.Length;
-
-            Random rnd = new();
-            do
+            Random rnd = new Random();
+            rnd.Next();
+            // int count = 0;
+            while (randomWord.Length != randomWordMinLength)
             {
-                randomWordTemp = lines[rnd.Next(lineCount)];
+                // count++;
+                randomWord = lines[rnd.Next(lineCount)];
+                // randomWord.Length.ic();
+                // count.ic();
             }
-            while (randomWordTemp.Length < randomWordMinLength);
-
-            randomWord = randomWordTemp;
+            // Extra space as needed by the Ag function to easily rotate chars
+            randomWord += ' ';
+            // randomWord.ic();
+            // lines.Length.ic();
+            // lines.Count().ic();
         }
 
     }
