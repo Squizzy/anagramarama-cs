@@ -1,4 +1,5 @@
 using System.Dynamic;
+using icecream;
 
 namespace ag
 {
@@ -82,14 +83,18 @@ namespace ag
         public static void DlbPush(ref Dlb_node? dlbHeadNode, string word)
         {
             Dlb_node? current = dlbHeadNode;
-            Dlb_node? previous = null;
+            Dlb_node previous = new Dlb_node();
+            string p = word;
             bool child = false;
             bool sibling = false;
             bool newHead = dlbHeadNode == null;
 
-            while (word.Length > 0)
+            while (p.Length > 0)
+            // while (word.Length > 0)
+
             {
-                char letter = word[0];
+                char letter = p[0];
+                // char letter = word[0];
 
                 if (current == null)
                 // This position can be reached when starting a new head (new dictionary linked list), 
@@ -123,7 +128,7 @@ namespace ag
                 {
                     // currentWordLetterNum++;
                     // Move to the next letter in the word (remove the first letter of the word)
-                    word = word[1..];
+                    p = p[1..];
                     // Declare that we are working with a child
                     child = true;
                     // set the current node to the child of the previous node (node will be null but the "child" will be set)
@@ -140,9 +145,9 @@ namespace ag
                 }
                 // } while (currentWordLetterNum < word.Length);
 
-                previous.valid = true;
                 //}
             }
+            previous.valid = true;
         }
 
 
@@ -165,6 +170,7 @@ namespace ag
                 for (int i = 0; i < lineCount; i++)
                 {
                     currentWord = sr.ReadLine();
+                    // currentWord.ic();
                     if (currentWord != null)
                     {
                         DlbPush(ref dlbHeadNode, currentWord);
@@ -173,12 +179,12 @@ namespace ag
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception: " + e.Message);
+                Console.WriteLine("DlbCreate Exception while creating dlbHeadNode: " + e.Message);
                 return false;
             }
             finally
             {
-                Console.WriteLine("executing final block");
+                Console.WriteLine("dlbHead Dictionary linked list created");
             }
             return true;
 
@@ -196,24 +202,28 @@ namespace ag
         public static bool DlbLookup(Dlb_node? dlbHeadNode, string word)
         {
             Dlb_node? current = dlbHeadNode;
-            Dlb_node? previous;
+            Dlb_node previous = new Dlb_node();
+            string p = word;
+            char letter;
             // bool retval = false;
             bool wordInDictionary = false;
 
-            while (word.Length > 0)
+            while (p.Length > 0)
             {
-                char letter = word[0];
+                letter = p[0];
 
                 if (current == null)
                 {
-                    return wordInDictionary;
+                    wordInDictionary = false;
+                    break;
+                    // return wordInDictionary;
                 }
 
                 previous = current;
 
                 if (letter == previous.letter)
                 {
-                    word = word[1..];
+                    p = p[1..];
                     current = previous.child;
                     wordInDictionary = previous.valid;
                 }
