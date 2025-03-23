@@ -4,9 +4,9 @@ using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using Microsoft.VisualBasic;
+// using Microsoft.VisualBasic;
 using SDL2;
-using static icecream.IceCream;
+// using static icecream.IceCream;
 
 
 
@@ -1346,7 +1346,7 @@ namespace ag
             Node current = headNode;
             while (current != null)
             {
-                current.anagram.ic($"{current.length}");
+                // current.anagram.ic($"{current.length}");
                 current = current.next;
             }
         }
@@ -1413,7 +1413,7 @@ namespace ag
                 bigWordLen = rootword.Length - 1; // GetRandomWord adds an extra space at the end
                 guess = "";
                 remain = rootword;
-                rootword.ic();
+                // rootword.ic();
 
                 DestroyAnswers(ref headNode);
 
@@ -1432,7 +1432,7 @@ namespace ag
 
             listHead(headNode);
 
-            rootword.ic();
+            // rootword.ic();
 
             // headNode.ic();
             /* now we have a good set of words - sort them alphabetically */
@@ -1598,10 +1598,12 @@ namespace ag
             dest.y = 0;
             dest.w = 800;
             dest.h = 600;
-                    SDL.SDL_RenderPresent(screen);
+                    // SDL.SDL_RenderPresent(screen);
 
             while (!done)
             {
+                DateTime frameStart = DateTime.Now;
+
                 while (SDL.SDL_PollEvent(out sdlEvent) != 0)  // need to use int as return is not a bool
                 {
 
@@ -1694,7 +1696,8 @@ namespace ag
                     // DisplayAnswerBoxes(headNode, screen);
                     // MoveSprite(screen, letters, letterSpeed);
                 }
-
+                
+                #region 
                 // int sdlRtn = SDL.SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
                 // if (sdlRtn != 0)
                 // {
@@ -1716,12 +1719,13 @@ namespace ag
                 // {
                 //     Console.WriteLine($"x {letters.x} - toX {letters.toX} - y {letters.y} toY {letters.toY}");
                 // }
+                #endregion
 
                 if (winGame)
-                    {
-                        stopTheClock = true;
-                        solvePuzzle = true;
-                    }
+                {
+                    stopTheClock = true;
+                    solvePuzzle = true;
+                }
 
                 if ((gameTime < AVAILABLE_TIME) && !stopTheClock)
                 {
@@ -1829,9 +1833,11 @@ namespace ag
                 MoveSprites(screen, letters, letterSpeed);
 
                 SDL.SDL_RenderPresent(screen);
-                
+
                 // Add a small delay to prevent CPU overuse
-                // SDL.SDL_Delay(16); // roughly 60 FPS
+                double frameTime = (DateTime.Now - frameStart).TotalMilliseconds;
+                double delay = Math.Max(0, 16 - frameTime);
+                SDL.SDL_Delay((uint)delay); // roughly 60 FPS
 
             }
         }
@@ -2100,7 +2106,7 @@ namespace ag
                 Console.WriteLine("Unable to set 800x600 video: %s", SDL.SDL_GetError());
                 return 1;
             }
-            IntPtr renderer = SDL.SDL_CreateRenderer(window, -1, 0);
+            IntPtr renderer = SDL.SDL_CreateRenderer(window, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED | SDL.SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC);
             if (renderer == IntPtr.Zero)
             {
                 Console.WriteLine("Rendered creating problem");
