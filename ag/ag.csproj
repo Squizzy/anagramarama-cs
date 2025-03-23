@@ -27,7 +27,7 @@
   <ItemGroup>
     <PackageReference Include="icecream" Version="3.2.0" />
     <PackageReference Include="Sayers.SDL2.Core" Version="1.0.11" />
-    <Resource Include="ag.ico" />
+    <Resource Include="res\ag.ico" />
   </ItemGroup>
 
 </Project>
